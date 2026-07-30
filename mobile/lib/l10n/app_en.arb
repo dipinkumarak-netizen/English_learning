@@ -1,0 +1,12 @@
+{
+  "@@locale": "en",
+  "appName": "NilaSpeak",
+  "welcomeMessage": "Build your English confidence, one small step at a time.",
+  "continueButton": "Continue",
+  "homeHeading": "Your learning home",
+  "loading": "Loading…",
+  "retry": "Retry",
+  "genericError": "Something went wrong.",
+  "offlineError": "You appear to be offline.",
+  "comingSoon": "Your personalised learning journey is coming soon."
+}

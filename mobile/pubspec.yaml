@@ -1,0 +1,25 @@
+name: nilaspeak_mobile
+description: "NilaSpeak Malayalam-first spoken English learning foundation."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  dio: ^5.8.0+1
+  flutter_riverpod: ^2.6.1
+  go_router: ^16.2.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true

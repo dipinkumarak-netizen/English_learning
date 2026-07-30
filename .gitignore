@@ -1,0 +1,52 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Flutter / Dart
+mobile/.dart_tool/
+mobile/.packages
+mobile/.pub/
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/coverage/
+mobile/lib/generated/
+mobile/lib/l10n/app_localizations*.dart
+**/generated_plugin_registrant.dart
+
+# Android
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/key.properties
+mobile/android/**/build/
+*.keystore
+*.jks
+
+# Python / FastAPI
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+backend/.coverage
+backend/htmlcov/
+
+# PostgreSQL / Docker
+*.sql.gz
+docker-data/
+
+# IDEs and operating system
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Generated outputs
+*.log
+dist/
+tmp/
