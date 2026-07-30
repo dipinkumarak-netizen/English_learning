@@ -20,6 +20,55 @@ final class ApiClient {
 
   final Dio _dio;
 
+  Future<Map<String, dynamic>> get(String path, {String? accessToken}) =>
+      _request(
+        () => _dio.get<Map<String, dynamic>>(
+          path,
+          options: _options(accessToken),
+        ),
+      );
+
+  Future<Map<String, dynamic>> post(
+    String path, {
+    Map<String, dynamic>? data,
+    String? accessToken,
+  }) => _request(
+    () => _dio.post<Map<String, dynamic>>(
+      path,
+      data: data,
+      options: _options(accessToken),
+    ),
+  );
+
+  Future<Map<String, dynamic>> put(
+    String path, {
+    Map<String, dynamic>? data,
+    String? accessToken,
+  }) => _request(
+    () => _dio.put<Map<String, dynamic>>(
+      path,
+      data: data,
+      options: _options(accessToken),
+    ),
+  );
+
+  Options _options(String? accessToken) => Options(
+    headers: {if (accessToken != null) 'Authorization': 'Bearer $accessToken'},
+  );
+
+  Future<Map<String, dynamic>> _request(
+    Future<Response<Map<String, dynamic>>> Function() request,
+  ) async {
+    try {
+      final response = await request();
+      return response.data ?? <String, dynamic>{};
+    } catch (error, stackTrace) {
+      final mapped = mapDioError(error);
+      AppLogger.instance.error('API request failed', mapped, stackTrace);
+      throw mapped;
+    }
+  }
+
   Future<Map<String, dynamic>> health() async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(

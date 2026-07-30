@@ -2,22 +2,26 @@
 
 ## Mobile
 
-The Flutter app uses a small feature-first structure. `app/` owns bootstrap, routing, and app-wide providers. `core/` owns configuration, errors, logging, networking, theme, and reusable widgets. Feature UI lives under `features/`. ARB files under `lib/l10n/` are the source of truth for English and Malayalam UI text.
+Flutter uses a feature-first structure. `app/` owns bootstrap, routing, and app-wide providers. `core/` owns configuration, errors, logging, networking, theme, and reusable widgets. Phase 2 features live under authentication, onboarding, placement_test, learner_profile, and learning_plan.
 
-Riverpod provides dependency injection and state foundations. GoRouter owns navigation. Widgets do not construct or depend directly on HTTP details; repositories and providers will be introduced with the first data feature.
+Riverpod provides dependency injection and state. GoRouter owns navigation and auth/onboarding redirects. Widgets do not construct HTTP details directly.
 
 ## Backend
 
-FastAPI exposes versioned API routes and a stable health schema. Pydantic Settings reads environment configuration. SQLAlchemy 2 async and Alembic provide the database foundation. PostgreSQL is the development database; Redis is intentionally deferred.
+FastAPI exposes versioned routes. Pydantic validates request/response schemas. SQLAlchemy 2 async and Alembic provide the PostgreSQL foundation. Phase 2 uses Argon2 password hashes, short-lived JWT access tokens, hashed opaque refresh sessions with rotation/revocation, and ownership-scoped private resources. Redis is deferred.
 
-## Data flow and future providers
+## Data flow
 
-Flutter → API client → versioned FastAPI route → domain/repository layer → database or provider adapter. Future LLM, translation, STT, TTS, and pronunciation integrations will be behind backend interfaces. API keys remain server-side so mobile binaries cannot expose them.
+Flutter → API client → versioned FastAPI route → database/domain service. Future LLM, translation, STT, TTS, and pronunciation providers will be backend adapters. API keys stay on the backend and never enter mobile binaries.
 
-## Offline direction
+## Local persistence
 
-Later phases will add a local Drift store for content and pending progress mutations. Sync will be explicit, idempotent, conflict-aware, and observable. Phase 1 does not persist learner data.
+Secure storage holds access and refresh tokens. SharedPreferences holds the application-language preference and resumable onboarding draft. The backend is authoritative for accounts, profiles, placement results, and plans. A future structured local database may support course content and queued mutations.
 
 ## Testing
 
-Flutter formatting, analysis, unit/widget tests, and Android build run in CI. Backend linting and API tests run with Python. Provider calls will use mocks and contract fixtures rather than live paid services.
+Flutter formatting, analysis, widget tests, and Android builds run in CI. Backend Ruff, mypy, API tests, and migration offline checks run in CI. Paid providers are not used in tests.
+
+## Product scope
+
+NilaSpeak is private personal-use software. Subscription, billing, entitlement, trial, purchase, Play Store publishing, and commercial analytics layers are removed from active scope.

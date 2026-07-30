@@ -1,28 +1,26 @@
 # NilaSpeak
 
-NilaSpeak is an original Malayalam-first spoken-English learning product. This repository currently contains only the Phase 1 technical foundation.
+NilaSpeak is an original Malayalam-first spoken-English learning application for private, personal use. It will not be commercially released or published on Google Play.
 
-## Phase 1 scope
+## Current scope
 
-The foundation includes a Flutter Android/Web app, English and Malayalam localisation, Material 3 themes, Riverpod and GoRouter setup, a FastAPI health API, PostgreSQL Compose configuration, structured logging, environment examples, CI, documentation, and baseline tests.
+Phase 1 foundation and Phase 2 are implemented: Flutter Android/Web setup, English/Malayalam localisation, Material 3, Riverpod, GoRouter, FastAPI, PostgreSQL/Alembic foundation, local email/password authentication, secure token lifecycle, learner profile, resumable onboarding, text placement assessment, and deterministic learning-plan generation.
 
-Authentication, lessons, AI, voice, pronunciation, payments, and user data features are intentionally not implemented yet.
+AI, voice, pronunciation, complete courses, vocabulary, payments, subscriptions, commercial analytics, admin, and social features are intentionally out of scope.
 
 ## Repository structure
 
 - `mobile/` — Flutter application.
-- `backend/` — FastAPI application and Alembic foundation.
+- `backend/` — FastAPI application, models, API routes, and Alembic migrations.
 - `docs/` — development, architecture, security, and roadmap documentation.
 - `.github/workflows/` — CI foundation.
 
-## Prerequisites
-
-Flutter stable is required for the mobile app. Python 3.12+ is required for the backend. Docker Desktop is required for the PostgreSQL development stack. Windows desktop is not a required target; Android is the primary target and Web is useful for quick UI checks.
-
 ## Setup
 
-Copy `.env.example` to `.env` for Compose, then follow [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md). Run Flutter checks from `mobile/`. Run backend checks from `backend/`.
+Flutter stable is required for Android/Web development. Python 3.14 currently validates the backend. Docker Desktop is optional for the PostgreSQL Compose stack and is not installed on the current machine. Copy `.env.example` to `.env`, then follow [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
+
+`ALLOW_REGISTRATION=false` disables new account creation on the backend while existing login continues to work. Use a long random `JWT_SECRET` outside local development.
 
 ## Known limitations
 
-The current development machine has Flutter but does not have Python, Docker, or Visual Studio. Backend tests and Docker validation must be run in an environment with those tools installed.
+The current machine has no Docker, so Compose build/runtime checks remain unverified. Local HTTP is for development only; any remote deployment requires HTTPS.

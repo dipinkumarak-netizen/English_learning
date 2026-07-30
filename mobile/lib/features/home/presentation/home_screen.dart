@@ -1,18 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../authentication/presentation/auth_controller.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(AppLocalizations.of(context)!.appName)),
-    body: Center(
-      child: Text(
-        AppLocalizations.of(context)!.homeHeading,
-        style: Theme.of(context).textTheme.headlineSmall,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.appName),
+        actions: [
+          IconButton(
+            tooltip: l10n.profile,
+            onPressed: () => context.go('/profile'),
+            icon: const Icon(Icons.person_outline),
+          ),
+        ],
       ),
-    ),
-  );
+      body: ListView(
+        padding: const EdgeInsets.all(24),
+        children: [
+          Text(
+            l10n.homeHeading,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 24),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.auto_graph),
+              title: Text(l10n.planSummary),
+              subtitle: Text(l10n.noPlan),
+              onTap: () => context.go('/learning-plan'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.fact_check_outlined),
+              title: Text(l10n.placementInvite),
+              subtitle: Text(l10n.placementDescription),
+              onTap: () => context.go('/placement'),
+            ),
+          ),
+          const SizedBox(height: 24),
+          OutlinedButton(
+            onPressed: () => ref.read(authStateProvider.notifier).signOut(),
+            child: Text(l10n.logout),
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -23,7 +23,7 @@ class WelcomeScreen extends ConsumerWidget {
             ],
             onChanged: (value) {
               if (value != null) {
-                ref.read(localeProvider.notifier).state = value;
+                ref.read(localeProvider.notifier).setLocale(value);
               }
             },
           ),

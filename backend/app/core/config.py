@@ -9,6 +9,10 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://nilaspeak:change-me-local@localhost:5432/nilaspeak"
     backend_cors_origins: str = "http://localhost:3000,http://localhost:8080"
     log_level: str = "INFO"
+    allow_registration: bool = True
+    jwt_secret: str = "local-development-secret-change-before-remote-use"
+    access_token_minutes: int = 15
+    refresh_token_days: int = 30
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
 

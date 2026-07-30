@@ -20,7 +20,7 @@ class SplashScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           FilledButton(
-            onPressed: () => context.go('/welcome'),
+            onPressed: () => context.go('/auth'),
             child: Text(AppLocalizations.of(context)!.continueButton),
           ),
         ],
