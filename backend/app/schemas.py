@@ -69,7 +69,6 @@ class RefreshRequest(BaseModel):
 
 class ProfileResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    application_language: str
     native_language: str
     explanation_language: str
     confidence_level: str | None
@@ -81,7 +80,6 @@ class ProfileResponse(BaseModel):
 
 
 class ProfileUpdate(BaseModel):
-    application_language: Language | None = None
     native_language: Language | None = None
     explanation_language: Language | None = None
     confidence_level: Confidence | None = None

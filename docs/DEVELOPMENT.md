@@ -10,6 +10,8 @@ flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000 -d <android-device-i
 
 The Android emulator reaches a host backend through `http://10.0.2.2:8000`. Web uses `http://localhost:8000`.
 
+The application interface is English-only. There is no UI-language switcher. Malayalam remains available as a learner native language and explanation language for educational content.
+
 ## Backend
 
 ```powershell

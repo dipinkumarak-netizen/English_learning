@@ -39,7 +39,6 @@ async def load_profile(user_id: str, db: AsyncSession) -> LearnerProfile:
 
 def profile_response(profile: LearnerProfile) -> ProfileResponse:
     return ProfileResponse(
-        application_language=profile.application_language,
         native_language=profile.native_language,
         explanation_language=profile.explanation_language,
         confidence_level=profile.confidence_level,
@@ -68,7 +67,6 @@ async def update_profile(
     if display_name is not None:
         user.display_name = display_name
     for field in (
-        "application_language",
         "native_language",
         "explanation_language",
         "confidence_level",
@@ -76,6 +74,8 @@ async def update_profile(
     ):
         if field in values:
             setattr(profile, field, values[field])
+    if "native_language" in values and "explanation_language" not in values:
+        profile.explanation_language = values["native_language"]
     if "learning_goals" in values:
         await db.execute(
             delete(LearningGoalSelection).where(LearningGoalSelection.profile_id == profile.id)

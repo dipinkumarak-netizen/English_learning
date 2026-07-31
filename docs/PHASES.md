@@ -17,4 +17,6 @@
 
 ## Next proposed scope
 
+Language scope update: the application interface is English-only. Malayalam remains supported as a learner native language and explanation language, independently of Flutter UI localisation.
+
 Phase 3 will add original data-driven beginner course content, lesson delivery, exercise rendering, lesson progress, and basic offline lesson caching. It will not add AI tutor, voice, pronunciation, payments, or commercial features.

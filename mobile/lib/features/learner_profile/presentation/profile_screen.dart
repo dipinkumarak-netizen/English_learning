@@ -30,12 +30,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               padding: const EdgeInsets.all(24),
               children: [
                 ListTile(
-                  title: Text(l10n.applicationLanguage),
-                  subtitle: Text(
-                    _profile!['application_language']?.toString() ?? '',
-                  ),
-                ),
-                ListTile(
                   title: Text(l10n.nativeLanguage),
                   subtitle: Text(
                     _profile!['native_language']?.toString() ?? '',

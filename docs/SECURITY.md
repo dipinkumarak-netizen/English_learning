@@ -11,3 +11,4 @@
 - Future AI endpoints require quotas for technical cost safety, request limits, input validation, prompt-injection resistance, provider timeouts, and safe logging. These are not paid-plan restrictions.
 - Audio will later require consent, MIME/size/duration limits, short retention, and deletion. Raw voice will not be retained by default.
 - Subscription, payment, billing, entitlement, trial, and promotional-access systems are permanently removed from the private-use scope.
+- Application UI language is English-only. Malayalam learning explanations are domain content and are not loaded through the application-locale system.

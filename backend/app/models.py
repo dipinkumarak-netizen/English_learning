@@ -63,7 +63,6 @@ class LearnerProfile(TimestampMixin, Base):
     user_id: Mapped[str] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), unique=True, index=True
     )
-    application_language: Mapped[str] = mapped_column(String(10), default="ml")
     native_language: Mapped[str] = mapped_column(String(10), default="ml")
     explanation_language: Mapped[str] = mapped_column(String(10), default="ml")
     confidence_level: Mapped[str | None] = mapped_column(String(40), nullable=True)

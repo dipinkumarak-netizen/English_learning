@@ -93,7 +93,6 @@ def test_onboarding_progress_profile_and_completion(client: TestClient) -> None:
     )
     payload = {
         "profile": {
-            "application_language": "ml",
             "native_language": "ml",
             "explanation_language": "ml",
             "confidence_level": "basics",
@@ -159,10 +158,16 @@ def test_malformed_token_logout_all_and_profile_validation(client: TestClient) -
         client.get("/api/v1/auth/me", headers={"Authorization": "Bearer malformed"}).status_code
         == 401
     )
-    assert (
-        client.put(
-            "/api/v1/profile", headers=headers, json={"application_language": "fr"}
-        ).status_code
-        == 422
-    )
+    obsolete = client.put("/api/v1/profile", headers=headers, json={"application_language": "fr"})
+    assert obsolete.status_code == 200
+    assert "application_language" not in obsolete.json()
     assert client.post("/api/v1/auth/logout-all", headers=headers).status_code == 204
+
+
+def test_native_language_defaults_explanation_language(client: TestClient) -> None:
+    auth = register(client)
+    headers = {"Authorization": f"Bearer {auth['access_token']}"}
+    response = client.put("/api/v1/profile", headers=headers, json={"native_language": "en"})
+    assert response.status_code == 200
+    assert response.json()["native_language"] == "en"
+    assert response.json()["explanation_language"] == "en"

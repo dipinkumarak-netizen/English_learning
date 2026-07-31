@@ -2,7 +2,7 @@
 
 ## Mobile
 
-Flutter uses a feature-first structure. `app/` owns bootstrap, routing, and app-wide providers. `core/` owns configuration, errors, logging, networking, theme, and reusable widgets. Phase 2 features live under authentication, onboarding, placement_test, learner_profile, and learning_plan.
+Flutter uses a feature-first structure. `app/` owns bootstrap, routing, and app-wide providers. `core/` owns configuration, errors, logging, networking, theme, and reusable widgets. Phase 2 features live under authentication, onboarding, placement_test, learner_profile, and learning_plan. The interface locale is English-only; Malayalam is a learner native/explanation language in domain content, not a Flutter UI locale.
 
 Riverpod provides dependency injection and state. GoRouter owns navigation and auth/onboarding redirects. Widgets do not construct HTTP details directly.
 
@@ -16,7 +16,7 @@ Flutter → API client → versioned FastAPI route → database/domain service. 
 
 ## Local persistence
 
-Secure storage holds access and refresh tokens. SharedPreferences holds the application-language preference and resumable onboarding draft. The backend is authoritative for accounts, profiles, placement results, and plans. A future structured local database may support course content and queued mutations.
+Secure storage holds access and refresh tokens. SharedPreferences holds only a resumable onboarding draft; no application-language preference is stored. The backend is authoritative for accounts, profiles, placement results, and plans. A future structured local database may support course content and queued mutations.
 
 ## Testing
 

@@ -5,9 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../app/app.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../authentication/presentation/auth_controller.dart';
+
+int normalizeOnboardingStep({
+  required int savedStep,
+  required bool hasLegacyApplicationStep,
+}) =>
+    (hasLegacyApplicationStep ? savedStep - 1 : savedStep).clamp(0, 5).toInt();
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -19,7 +24,6 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   static const _draftKey = 'onboarding_draft';
   int _step = 0;
-  String _applicationLanguage = 'ml';
   String _nativeLanguage = 'ml';
   String _explanationLanguage = 'ml';
   String _confidence = 'basics';
@@ -75,7 +79,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-              child: LinearProgressIndicator(value: (_step + 1) / 7),
+              child: LinearProgressIndicator(value: (_step + 1) / 6),
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -100,7 +104,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       onPressed: _busy ? null : () => _next(l10n),
                       child: _busy
                           ? const CircularProgressIndicator()
-                          : Text(_step == 6 ? l10n.finish : l10n.next),
+                          : Text(_step == 5 ? l10n.finish : l10n.next),
                     ),
                   ),
                 ],
@@ -116,33 +120,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     switch (_step) {
       case 0:
         return _choiceSection(
-          l10n.applicationLanguage,
-          ['ml', 'en'],
-          _applicationLanguage,
-          (value) {
-            setState(() => _applicationLanguage = value);
-            ref.read(localeProvider.notifier).setLocale(Locale(value));
-          },
-        );
-      case 1:
-        return _choiceSection(
           l10n.nativeLanguage,
           ['ml', 'en'],
           _nativeLanguage,
-          (value) => setState(() => _nativeLanguage = value),
+          (value) => setState(() {
+            _nativeLanguage = value;
+            _explanationLanguage = value;
+          }),
         );
-      case 2:
+      case 1:
         return _choiceSection(
           l10n.confidence,
           _confidenceOptions,
           _confidence,
           (value) => setState(() => _confidence = value),
         );
-      case 3:
+      case 2:
         return _multiChoiceSection(l10n.goals, _goalOptions, _goals);
-      case 4:
+      case 3:
         return _multiChoiceSection(l10n.difficultAreas, _areaOptions, _areas);
-      case 5:
+      case 4:
         return _choiceSection(
           l10n.dailyStudyTime,
           ['5', '10', '15', '20', '30'],
@@ -217,14 +214,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   );
 
   Future<void> _next(AppLocalizations l10n) async {
-    if ((_step == 3 && _goals.isEmpty) || (_step == 4 && _areas.isEmpty)) {
+    if ((_step == 2 && _goals.isEmpty) || (_step == 3 && _areas.isEmpty)) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.selectOne)));
       return;
     }
     await _saveDraft();
-    if (_step < 6) {
+    if (_step < 5) {
       setState(() => _step++);
       return;
     }
@@ -233,7 +230,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       final token = await ref.read(tokenStorageProvider).readAccessToken();
       if (token == null) throw StateError('No session');
       final profile = {
-        'application_language': _applicationLanguage,
         'native_language': _nativeLanguage,
         'explanation_language': _explanationLanguage,
         'confidence_level': _confidence,
@@ -263,14 +259,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   Future<void> _loadDraft() async {
     final preferences = await SharedPreferences.getInstance();
+    await preferences.remove('application_language');
     final raw = preferences.getString(_draftKey);
     if (raw == null) return;
     final draft = jsonDecode(raw) as Map<String, dynamic>;
     if (!mounted) return;
     setState(() {
-      _step = draft['step'] as int? ?? 0;
-      _applicationLanguage =
-          draft['application_language'] as String? ?? _applicationLanguage;
+      final savedStep = draft['step'] as int? ?? 0;
+      final hadLegacyApplicationStep = draft.containsKey(
+        'application_language',
+      );
+      _step = normalizeOnboardingStep(
+        savedStep: savedStep,
+        hasLegacyApplicationStep: hadLegacyApplicationStep,
+      );
       _nativeLanguage = draft['native_language'] as String? ?? _nativeLanguage;
       _explanationLanguage =
           draft['explanation_language'] as String? ?? _explanationLanguage;
@@ -291,7 +293,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       _draftKey,
       jsonEncode({
         'step': _step,
-        'application_language': _applicationLanguage,
         'native_language': _nativeLanguage,
         'explanation_language': _explanationLanguage,
         'confidence': _confidence,
