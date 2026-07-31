@@ -82,10 +82,15 @@ class _VoiceConversationScreenState
                   controller.errorMessage!,
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
-                if (controller.errorMessage!.contains('blocked'))
+                if (controller.permissionPermanentlyDenied)
                   OutlinedButton(
                     onPressed: notifier.openMicrophoneSettings,
                     child: const Text('Open Settings'),
+                  )
+                else if (controller.permissionDenied)
+                  OutlinedButton(
+                    onPressed: notifier.startRecording,
+                    child: const Text('Retry microphone permission'),
                   ),
               ],
               Center(
@@ -183,6 +188,9 @@ class _StatusCard extends StatelessWidget {
   );
 
   String _label(VoiceState state) => switch (state) {
+    VoiceState.idle => 'Tap Record turn to request microphone access',
+    VoiceState.requestingPermission => 'Checking microphone permission',
+    VoiceState.ready => 'Recorder ready',
     VoiceState.recording => 'Recording',
     VoiceState.uploading => 'Uploading securely',
     VoiceState.transcribing => 'Transcribing',
@@ -191,7 +199,7 @@ class _StatusCard extends StatelessWidget {
     VoiceState.synthesising => 'Creating tutor audio',
     VoiceState.playingTutorAudio => 'Playing tutor audio',
     VoiceState.failed => 'Needs attention',
-    _ => 'Ready for a turn',
+    _ => 'Voice recorder is not active',
   };
 }
 

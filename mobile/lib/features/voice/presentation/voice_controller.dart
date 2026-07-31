@@ -9,6 +9,7 @@ import 'package:record/record.dart';
 
 import '../data/voice_repository.dart';
 import 'voice_state_machine.dart';
+import 'voice_readiness.dart';
 
 class VoiceController extends ChangeNotifier {
   VoiceController(
@@ -23,6 +24,10 @@ class VoiceController extends ChangeNotifier {
   final AudioPlayer _player;
   VoiceState state = VoiceState.idle;
   String? errorMessage;
+  PermissionStatus microphonePermission = PermissionStatus.denied;
+  bool permissionRequested = false;
+  bool recorderReady = false;
+  String? selectedEncoder;
   String? sessionId;
   String? turnId;
   String? recordingPath;
@@ -37,20 +42,26 @@ class VoiceController extends ChangeNotifier {
 
   static const maxRecordingSeconds = 60;
 
-  bool get canRecord =>
-      state == VoiceState.ready ||
-      state == VoiceState.recorded ||
-      state == VoiceState.cancelled;
+  bool get canRecord => recordTurnButtonEnabled(state);
+
+  bool get permissionDenied =>
+      permissionRequested &&
+      (microphonePermission == PermissionStatus.denied ||
+          microphonePermission == PermissionStatus.restricted);
+
+  bool get permissionPermanentlyDenied =>
+      microphonePermission == PermissionStatus.permanentlyDenied;
 
   Future<bool> requestMicrophone() async {
     state = VoiceState.requestingPermission;
     notifyListeners();
     final status = await Permission.microphone.request();
+    permissionRequested = true;
+    microphonePermission = status;
     if (status.isGranted) {
-      state = VoiceState.ready;
-      errorMessage = null;
+      await _prepareRecorder();
       notifyListeners();
-      return true;
+      return recorderReady;
     }
     state = VoiceState.failed;
     errorMessage = status.isPermanentlyDenied
@@ -69,15 +80,39 @@ class VoiceController extends ChangeNotifier {
     recordingPath =
         '${directory.path}${Platform.pathSeparator}nilaspeak-${DateTime.now().microsecondsSinceEpoch}.m4a';
     try {
-      await _recorder.start(
+      selectedEncoder = null;
+      final configs = <RecordConfig>[
         const RecordConfig(
           encoder: AudioEncoder.aacLc,
           bitRate: 64000,
           sampleRate: 16000,
           numChannels: 1,
         ),
-        path: recordingPath!,
-      );
+        const RecordConfig(
+          encoder: AudioEncoder.aacLc,
+          bitRate: 96000,
+          sampleRate: 44100,
+          numChannels: 1,
+        ),
+      ];
+      Object? lastError;
+      for (final config in configs) {
+        if (!await _recorder.isEncoderSupported(config.encoder)) continue;
+        try {
+          await _recorder.start(config, path: recordingPath!);
+          selectedEncoder =
+              '${config.encoder.name}-${config.sampleRate}Hz-${config.bitRate}bps';
+          lastError = null;
+          break;
+        } catch (error) {
+          lastError = error;
+        }
+      }
+      if (lastError != null || selectedEncoder == null) {
+        throw StateError(
+          lastError?.toString() ?? 'AAC-LC is not supported on this device.',
+        );
+      }
       state = VoiceState.recording;
       recordingSeconds = 0;
       errorMessage = null;
@@ -88,11 +123,33 @@ class VoiceController extends ChangeNotifier {
         notifyListeners();
       });
       notifyListeners();
-    } catch (_) {
+    } catch (error) {
       state = VoiceState.failed;
-      errorMessage = 'Recording could not start. Use text tutor or try again.';
+      errorMessage = recorderFailureMessage(error);
       notifyListeners();
     }
+  }
+
+  Future<void> _prepareRecorder() async {
+    recorderReady = false;
+    selectedEncoder = null;
+    try {
+      final supported = await _recorder.isEncoderSupported(AudioEncoder.aacLc);
+      if (!supported) {
+        state = VoiceState.failed;
+        errorMessage = 'AAC-LC/M4A recording is not supported on this device.';
+        notifyListeners();
+        return;
+      }
+    } catch (error) {
+      state = VoiceState.failed;
+      errorMessage = recorderFailureMessage(error);
+      notifyListeners();
+      return;
+    }
+    recorderReady = true;
+    state = VoiceState.ready;
+    errorMessage = null;
   }
 
   Future<void> stopRecording() async {
