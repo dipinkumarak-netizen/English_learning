@@ -77,7 +77,7 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
               if (step['step_type'] == 'exercise' &&
                   step['exercise'] is Map<String, dynamic>) ...[
                 const SizedBox(height: 24),
-                _ExerciseCard(
+                ExerciseRenderer(
                   exercise: step['exercise'] as Map<String, dynamic>,
                   answer: _answer,
                   submitted: _submitted,
@@ -200,8 +200,9 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
   }
 }
 
-class _ExerciseCard extends StatefulWidget {
-  const _ExerciseCard({
+class ExerciseRenderer extends StatefulWidget {
+  const ExerciseRenderer({
+    super.key,
     required this.exercise,
     required this.answer,
     required this.submitted,
@@ -215,10 +216,10 @@ class _ExerciseCard extends StatefulWidget {
   final ValueChanged<Object> onAnswer;
 
   @override
-  State<_ExerciseCard> createState() => _ExerciseCardState();
+  State<ExerciseRenderer> createState() => _ExerciseRendererState();
 }
 
-class _ExerciseCardState extends State<_ExerciseCard> {
+class _ExerciseRendererState extends State<ExerciseRenderer> {
   late final TextEditingController _textController;
 
   @override

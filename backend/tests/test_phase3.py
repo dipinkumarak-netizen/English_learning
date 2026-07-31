@@ -80,3 +80,39 @@ def test_locked_lesson_rejects_access(client):
     courses = client.get("/api/v1/courses", headers=headers).json()["courses"][0]
     second = courses["modules"][0]["lessons"][1]
     assert client.post(f"/api/v1/lessons/{second['id']}/start", headers=headers).status_code == 423
+
+
+def test_progress_is_scoped_and_sync_operations_are_idempotent(client):
+    seed()
+    first = register(client)
+    first_headers = auth_headers(first)
+    course = client.get("/api/v1/courses", headers=first_headers).json()["courses"][0]
+    lesson = course["modules"][0]["lessons"][0]
+    assert (
+        client.post(f"/api/v1/lessons/{lesson['id']}/start", headers=first_headers).status_code
+        == 200
+    )
+
+    second = client.post(
+        "/api/v1/auth/register",
+        json={"email": "other@example.com", "password": "Password123", "display_name": "Other"},
+    ).json()
+    second_headers = auth_headers(second)
+    other_progress = client.get(f"/api/v1/lessons/{lesson['id']}/progress", headers=second_headers)
+    assert other_progress.status_code == 200
+    assert other_progress.json()["completed_steps"] == []
+
+    operation = {
+        "operations": [
+            {
+                "client_operation_id": "sync-start-001",
+                "operation_type": "start_lesson",
+                "entity_id": lesson["id"],
+                "payload": {},
+            }
+        ]
+    }
+    first_sync = client.post("/api/v1/progress/sync", headers=first_headers, json=operation)
+    second_sync = client.post("/api/v1/progress/sync", headers=first_headers, json=operation)
+    assert first_sync.json()["processed"] == ["sync-start-001"]
+    assert second_sync.json()["processed"] == ["sync-start-001"]
