@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
 
@@ -17,11 +16,6 @@ class SplashScreen extends StatelessWidget {
           Text(
             AppLocalizations.of(context)!.appName,
             style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: 24),
-          FilledButton(
-            onPressed: () => context.go('/auth'),
-            child: Text(AppLocalizations.of(context)!.continueButton),
           ),
         ],
       ),

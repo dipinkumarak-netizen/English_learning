@@ -23,30 +23,31 @@ import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/settings/presentation/migration_screen.dart';
 import 'route_names.dart';
 
+String? appRedirect(AuthState auth, String location) {
+  if (auth.status == AuthStatus.loading) {
+    return location == '/splash' ? null : '/splash';
+  }
+  if (location == '/splash') {
+    return auth.onboardingComplete ? '/home' : '/onboarding';
+  }
+  if (location == '/auth' || location == '/signin' || location == '/signup') {
+    return auth.isAuthenticated ? '/home' : null;
+  }
+  if (!auth.onboardingComplete &&
+      location != '/onboarding' &&
+      location != '/placement' &&
+      location != '/settings' &&
+      location != '/migration') {
+    return '/onboarding';
+  }
+  return null;
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final auth = ref.watch(authStateProvider);
   return GoRouter(
     initialLocation: '/splash',
-    redirect: (context, state) {
-      final location = state.matchedLocation;
-      if (auth.status == AuthStatus.loading) {
-        return location == '/splash' ? null : '/splash';
-      }
-      if (location == '/splash') return null;
-      if (location == '/auth' ||
-          location == '/signin' ||
-          location == '/signup') {
-        return auth.isAuthenticated ? '/home' : null;
-      }
-      if (!auth.onboardingComplete &&
-          location != '/onboarding' &&
-          location != '/placement' &&
-          location != '/settings' &&
-          location != '/migration') {
-        return '/onboarding';
-      }
-      return null;
-    },
+    redirect: (context, state) => appRedirect(auth, state.matchedLocation),
     errorBuilder: (context, state) =>
         ErrorScreen(message: state.error?.toString()),
     routes: [
