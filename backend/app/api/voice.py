@@ -146,6 +146,20 @@ async def _daily_seconds(user_id: str, db: AsyncSession) -> int:
     )
 
 
+async def _daily_synthesis_characters(user_id: str, db: AsyncSession) -> int:
+    since = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+    return int(
+        await db.scalar(
+            select(func.coalesce(func.sum(VoiceUsageRecord.synthesis_characters), 0)).where(
+                VoiceUsageRecord.user_id == user_id,
+                VoiceUsageRecord.operation == "synthesise",
+                VoiceUsageRecord.created_at >= since,
+            )
+        )
+        or 0
+    )
+
+
 @router.post("/sessions", status_code=201)
 async def create_session(
     payload: VoiceSessionCreate,
@@ -417,6 +431,11 @@ async def synthesise(
     text = (text or message.tutor_reply or "").strip()
     if len(text) > get_settings().tts_max_text_characters:
         raise HTTPException(status_code=413, detail="Tutor audio text is too long.")
+    if (
+        await _daily_synthesis_characters(user.id, db) + len(text)
+        > get_settings().voice_daily_synthesis_characters
+    ):
+        raise HTTPException(status_code=429, detail="Daily tutor-audio safety limit reached.")
     try:
         provider = build_tts_provider(get_settings())
         result = await provider.synthesise(
