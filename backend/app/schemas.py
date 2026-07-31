@@ -249,6 +249,7 @@ class LessonSummaryResponse(BaseModel):
     estimated_minutes: int
     difficulty: str
     sort_order: int
+    day_number: int
     version: int
     is_published: bool
     offline_eligible: bool

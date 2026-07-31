@@ -10,10 +10,10 @@ void main() {
     expect(appRedirect(state, '/signin'), isNull);
   });
 
-  test('completed local profile goes to home', () {
+  test('completed local profile goes to dashboard', () {
     const state = AuthState(status: AuthStatus.local, onboardingComplete: true);
-    expect(appRedirect(state, '/splash'), '/home');
-    expect(appRedirect(state, '/home'), isNull);
+    expect(appRedirect(state, '/splash'), '/dashboard');
+    expect(appRedirect(state, '/home'), '/dashboard');
   });
 
   test('loading bootstrap stays on splash', () {

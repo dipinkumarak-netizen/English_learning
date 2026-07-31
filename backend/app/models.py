@@ -244,12 +244,17 @@ class CourseModule(TimestampMixin, Base):
 
 class Lesson(TimestampMixin, Base):
     __tablename__ = "lessons"
-    __table_args__ = (UniqueConstraint("module_id", "sort_order"),)
+    __table_args__ = (
+        UniqueConstraint("module_id", "sort_order"),
+        UniqueConstraint("course_id", "day_number"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
     module_id: Mapped[str] = mapped_column(
         ForeignKey("course_modules.id", ondelete="CASCADE"), index=True
     )
+    course_id: Mapped[str] = mapped_column(ForeignKey("courses.id", ondelete="CASCADE"), index=True)
+    day_number: Mapped[int] = mapped_column(Integer, index=True)
     slug: Mapped[str] = mapped_column(String(140), unique=True, index=True)
     title: Mapped[str] = mapped_column(String(200))
     summary: Mapped[str] = mapped_column(Text)

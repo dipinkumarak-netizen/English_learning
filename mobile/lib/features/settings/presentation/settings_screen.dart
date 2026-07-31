@@ -64,11 +64,11 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 12),
                         FilledButton(
-                          onPressed: () => context.go('/signin'),
+                          onPressed: () => context.push('/signin'),
                           child: const Text('Sign in'),
                         ),
                         OutlinedButton(
-                          onPressed: () => context.go('/signup'),
+                          onPressed: () => context.push('/signup'),
                           child: const Text('Create account'),
                         ),
                         const Text(
@@ -86,17 +86,17 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.person_outline),
             title: const Text('Profile'),
-            onTap: () => context.go('/profile'),
+            onTap: () => context.push('/profile'),
           ),
           ListTile(
             leading: const Icon(Icons.fact_check_outlined),
             title: const Text('Retake placement test'),
-            onTap: () => context.go('/placement'),
+            onTap: () => context.push('/placement'),
           ),
           ListTile(
             leading: const Icon(Icons.auto_graph),
             title: const Text('Recalculate learning plan'),
-            onTap: () => context.go('/learning-plan'),
+            onTap: () => context.push('/learning-plan'),
           ),
           const SizedBox(height: 16),
           const Text(

@@ -61,7 +61,7 @@ class CourseLibraryScreen extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      onTap: () => context.go('/courses/${course['id']}'),
+                      onTap: () => context.push('/courses/${course['id']}'),
                     ),
                   );
                 },

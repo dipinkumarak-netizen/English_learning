@@ -96,7 +96,7 @@ async def _flatten_lessons(course_id: str, db: AsyncSession) -> list[Lesson]:
                 await db.scalars(
                     select(Lesson)
                     .where(Lesson.module_id == module.id, Lesson.is_published.is_(True))
-                    .order_by(Lesson.sort_order)
+                    .order_by(Lesson.day_number)
                 )
             ).all()
         )
@@ -163,6 +163,7 @@ async def _lesson_summary(user_id: str, lesson: Lesson, db: AsyncSession) -> Les
         estimated_minutes=lesson.estimated_minutes,
         difficulty=lesson.difficulty,
         sort_order=lesson.sort_order,
+        day_number=lesson.day_number,
         version=lesson.version,
         is_published=lesson.is_published,
         offline_eligible=lesson.offline_eligible,

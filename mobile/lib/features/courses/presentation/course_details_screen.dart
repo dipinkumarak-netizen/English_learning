@@ -83,7 +83,7 @@ class _ModuleCard extends StatelessWidget {
                   ? Text('${lesson['score'] ?? 0}%')
                   : null,
               onTap: lesson['unlocked'] == true
-                  ? () => context.go('/lessons/${lesson['id']}')
+                  ? () => context.push('/lessons/${lesson['id']}')
                   : null,
             ),
         ],

@@ -241,11 +241,14 @@ async def seed_curriculum(db: AsyncSession) -> str:
         for lesson_number, (lesson_slug, title, summary, grammar, vocabulary) in enumerate(
             lesson_data, 1
         ):
+            day_number = (module_number - 1) * 3 + lesson_number
             lesson = await db.scalar(select(Lesson).where(Lesson.slug == lesson_slug))
             if lesson is None:
                 lesson = Lesson(
                     id=stable_id(f"lesson:{lesson_slug}"),
                     module_id=module.id,
+                    course_id=course.id,
+                    day_number=day_number,
                     slug=lesson_slug,
                     title=title,
                     summary=summary,
@@ -262,6 +265,9 @@ async def seed_curriculum(db: AsyncSession) -> str:
                 )
                 db.add(lesson)
                 await db.flush()
+            else:
+                lesson.course_id = course.id
+                lesson.day_number = day_number
             previous_lesson_id = lesson.id
             existing_steps = int(
                 await db.scalar(

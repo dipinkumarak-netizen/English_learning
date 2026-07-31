@@ -5,10 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../../../core/widgets/app_error_view.dart';
 import '../../../core/widgets/app_loading_indicator.dart';
 import 'course_providers.dart';
+import 'daily_learning.dart';
 
 class LessonPlayerScreen extends ConsumerStatefulWidget {
-  const LessonPlayerScreen({required this.lessonId, super.key});
+  const LessonPlayerScreen({required this.lessonId, this.dayNumber, super.key});
   final String lessonId;
+  final int? dayNumber;
 
   @override
   ConsumerState<LessonPlayerScreen> createState() => _LessonPlayerScreenState();
@@ -27,7 +29,11 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
   Widget build(BuildContext context) {
     final lesson = ref.watch(lessonDetailsProvider(widget.lessonId));
     return Scaffold(
-      appBar: AppBar(title: const Text('Lesson')),
+      appBar: AppBar(
+        title: Text(
+          widget.dayNumber == null ? 'Lesson' : 'Day ${widget.dayNumber}',
+        ),
+      ),
       body: lesson.when(
         loading: () => const AppLoadingIndicator(),
         error: (error, _) => AppErrorView(
@@ -179,13 +185,21 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
 
   Future<void> _showCompletion(Map<String, dynamic> result) async {
     if (!mounted) return;
+    ref.invalidate(dailyLearningPathProvider);
+    final dayLabel = widget.dayNumber == null
+        ? 'Lesson'
+        : 'Day ${widget.dayNumber}';
+    final isCourseComplete = widget.dayNumber == 12;
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Lesson complete'),
+        title: Text(
+          isCourseComplete ? 'Course complete' : '$dayLabel complete',
+        ),
         content: Text(
-          'Score: ${(result['score'] as num?)?.round() ?? 0}%\nKeep practising a little every day.',
+          'Score: ${(result['score'] as num?)?.round() ?? 0}%\n'
+          '${isCourseComplete ? 'You completed all 12 days.' : 'The next day is now unlocked.'}',
         ),
         actions: [
           FilledButton(

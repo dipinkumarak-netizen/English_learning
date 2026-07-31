@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../shell/app_shell.dart';
 import '../../features/authentication/presentation/auth_controller.dart';
 import '../../features/authentication/presentation/auth_gate_screen.dart';
 import '../../features/authentication/presentation/sign_in_screen.dart';
@@ -14,6 +15,7 @@ import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/error/presentation/error_screen.dart';
 import '../../features/courses/presentation/course_details_screen.dart';
 import '../../features/courses/presentation/course_library_screen.dart';
+import '../../features/courses/presentation/daily_learning_path_screen.dart';
 import '../../features/courses/presentation/lesson_player_screen.dart';
 import '../../features/courses/presentation/progress_summary_screen.dart';
 import '../../features/tutor/presentation/mistake_notebook_screen.dart';
@@ -28,7 +30,10 @@ String? appRedirect(AuthState auth, String location) {
     return location == '/splash' ? null : '/splash';
   }
   if (location == '/splash') {
-    return auth.onboardingComplete ? '/home' : '/onboarding';
+    return auth.onboardingComplete ? '/dashboard' : '/onboarding';
+  }
+  if (location == '/home') {
+    return auth.onboardingComplete ? '/dashboard' : '/onboarding';
   }
   if (location == '/auth' || location == '/signin' || location == '/signup') {
     return auth.isAuthenticated ? '/home' : null;
@@ -62,16 +67,58 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
       GoRoute(path: '/placement', builder: (_, _) => const PlacementScreen()),
       GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
-      GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(path: '/migration', builder: (_, _) => const MigrationScreen()),
       GoRoute(
         path: '/learning-plan',
         builder: (_, _) => const LearningPlanScreen(),
       ),
-      GoRoute(
-        name: RouteNames.home,
-        path: '/home',
-        builder: (_, _) => const HomeScreen(),
+      GoRoute(path: '/home', redirect: (_, _) => '/dashboard'),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            AppShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                name: RouteNames.home,
+                path: '/dashboard',
+                builder: (_, _) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/learn',
+                builder: (_, _) => const DailyLearningPathScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/tutor',
+                builder: (_, _) => const TutorHomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/progress',
+                builder: (_, _) => const ProgressSummaryScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/settings',
+                builder: (_, _) => const SettingsScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(path: '/courses', builder: (_, _) => const CourseLibraryScreen()),
       GoRoute(
@@ -81,14 +128,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/lessons/:lessonId',
-        builder: (_, state) =>
-            LessonPlayerScreen(lessonId: state.pathParameters['lessonId']!),
+        builder: (_, state) => LessonPlayerScreen(
+          lessonId: state.pathParameters['lessonId']!,
+          dayNumber: int.tryParse(state.uri.queryParameters['day'] ?? ''),
+        ),
       ),
-      GoRoute(
-        path: '/progress',
-        builder: (_, _) => const ProgressSummaryScreen(),
-      ),
-      GoRoute(path: '/tutor', builder: (_, _) => const TutorHomeScreen()),
       GoRoute(
         path: '/tutor/chat/:conversationId',
         builder: (_, state) => TutorChatScreen(

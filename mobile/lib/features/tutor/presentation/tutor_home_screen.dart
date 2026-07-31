@@ -38,15 +38,15 @@ class _TutorHomeScreenState extends ConsumerState<TutorHomeScreen> {
               ),
               const SizedBox(height: 20),
               FilledButton(
-                onPressed: () => context.go('/signin'),
+                onPressed: () => context.push('/signin'),
                 child: const Text('Sign in'),
               ),
               OutlinedButton(
-                onPressed: () => context.go('/signup'),
+                onPressed: () => context.push('/signup'),
                 child: const Text('Create account'),
               ),
               TextButton(
-                onPressed: () => context.go('/home'),
+                onPressed: () => context.go('/dashboard'),
                 child: const Text('Not now'),
               ),
             ],
