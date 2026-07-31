@@ -67,7 +67,21 @@ class _LearningPlanScreenState extends ConsumerState<LearningPlanScreen> {
 
   Future<void> _load() async {
     final token = await ref.read(tokenStorageProvider).readAccessToken();
-    if (token == null) return;
+    if (token == null) {
+      final profile = await ref.read(databaseProvider).localProfile();
+      if (mounted) {
+        setState(
+          () => _plan = {
+            'estimated_level': 'A1',
+            'recommended_track': 'Everyday English foundations',
+            'daily_study_minutes': profile?.dailyStudyMinutes ?? 10,
+            'priority_skills': ['grammar', 'vocabulary', 'speaking'],
+            'weekly_target_minutes': (profile?.dailyStudyMinutes ?? 10) * 5,
+          },
+        );
+      }
+      return;
+    }
     try {
       final plan = await ref
           .read(apiClientProvider)

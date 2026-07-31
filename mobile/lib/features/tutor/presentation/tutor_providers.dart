@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../authentication/presentation/auth_controller.dart';
-import '../../courses/presentation/course_providers.dart';
 import '../data/tutor_repository.dart';
 
 final tutorRepositoryProvider = Provider<TutorRepository>(

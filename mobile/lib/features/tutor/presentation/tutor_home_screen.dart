@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/widgets/app_error_view.dart';
 import '../../../core/widgets/app_loading_indicator.dart';
 import 'tutor_providers.dart';
+import '../../authentication/presentation/auth_controller.dart';
 
 class TutorHomeScreen extends ConsumerStatefulWidget {
   const TutorHomeScreen({super.key});
@@ -19,6 +20,40 @@ class _TutorHomeScreenState extends ConsumerState<TutorHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!ref.watch(authStateProvider).isAuthenticated) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('AI English tutor')),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Sign in to use the AI Tutor',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'The AI Tutor uses the secure NilaSpeak backend to generate responses and save your tutor history.',
+              ),
+              const SizedBox(height: 20),
+              FilledButton(
+                onPressed: () => context.go('/signin'),
+                child: const Text('Sign in'),
+              ),
+              OutlinedButton(
+                onPressed: () => context.go('/signup'),
+                child: const Text('Create account'),
+              ),
+              TextButton(
+                onPressed: () => context.go('/home'),
+                child: const Text('Not now'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     final conversations = ref.watch(tutorConversationsProvider);
     final usage = ref.watch(tutorUsageProvider);
     return Scaffold(

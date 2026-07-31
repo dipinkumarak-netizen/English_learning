@@ -59,6 +59,16 @@ final class ApiClient {
     accessToken,
   );
 
+  Future<void> delete(String path, {String? accessToken}) async {
+    try {
+      await _dio.delete<void>(path, options: _options(accessToken));
+    } catch (error, stackTrace) {
+      final mapped = mapDioError(error);
+      AppLogger.instance.error('API delete failed', mapped, stackTrace);
+      throw mapped;
+    }
+  }
+
   Options _options(String? accessToken) => Options(
     headers: {if (accessToken != null) 'Authorization': 'Bearer $accessToken'},
   );

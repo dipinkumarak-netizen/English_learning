@@ -1,10 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/local/app_database.dart';
 import '../../authentication/presentation/auth_controller.dart';
 import '../data/course_repository.dart';
 
-final databaseProvider = Provider<AppDatabase>((ref) => AppDatabase());
 final courseRepositoryProvider = Provider<CourseRepository>(
   (ref) => CourseRepository(
     ref.watch(apiClientProvider),

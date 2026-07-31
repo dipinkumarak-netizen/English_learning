@@ -129,6 +129,27 @@ class TutorDrafts extends Table {
   Set<Column<Object>> get primaryKey => {conversationId};
 }
 
+class LocalLearnerProfiles extends Table {
+  TextColumn get id => text()();
+  TextColumn get displayName => text().withDefault(const Constant('Learner'))();
+  TextColumn get nativeLanguage => text().withDefault(const Constant('ml'))();
+  TextColumn get explanationLanguage =>
+      text().withDefault(const Constant('ml'))();
+  TextColumn get confidenceLevel => text().nullable()();
+  TextColumn get learningGoals => text().withDefault(const Constant('[]'))();
+  TextColumn get difficultAreas => text().withDefault(const Constant('[]'))();
+  IntColumn get dailyStudyMinutes => integer().nullable()();
+  BoolColumn get onboardingComplete =>
+      boolean().withDefault(const Constant(false))();
+  TextColumn get placementResult => text().nullable()();
+  TextColumn get learningPlanSummary => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     CachedCourses,
@@ -143,13 +164,14 @@ class TutorDrafts extends Table {
     CachedTutorMistakes,
     CachedTutorSummaries,
     TutorDrafts,
+    LocalLearnerProfiles,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -162,6 +184,7 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(cachedTutorSummaries);
         await m.createTable(tutorDrafts);
       }
+      if (from < 3) await m.createTable(localLearnerProfiles);
     },
   );
 
@@ -203,6 +226,23 @@ class AppDatabase extends _$AppDatabase {
       cachedAt: DateTime.now(),
     ),
   );
+
+  Future<LocalLearnerProfile?> localProfile() =>
+      select(localLearnerProfiles).getSingleOrNull();
+
+  Future<void> saveLocalProfile(LocalLearnerProfilesCompanion profile) =>
+      into(localLearnerProfiles).insertOnConflictUpdate(profile);
+
+  Future<void> resetLocalLearningData() async {
+    await delete(localLearnerProfiles).go();
+    await delete(localLessonProgress).go();
+    await delete(pendingSyncOperations).go();
+    await delete(cachedTutorConversations).go();
+    await delete(cachedTutorMessages).go();
+    await delete(cachedTutorMistakes).go();
+    await delete(cachedTutorSummaries).go();
+    await delete(tutorDrafts).go();
+  }
 }
 
 LazyDatabase _openConnection() {

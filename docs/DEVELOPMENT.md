@@ -44,3 +44,4 @@ Copy `.env.example` to `.env`, then run `docker compose config` and `docker comp
 Set `ALLOW_REGISTRATION=false` after creating the personal account. Use HTTPS and a strong `JWT_SECRET` for any remote deployment. Password recovery email, social login, and phone OTP are intentionally not implemented.
 
 The mobile Phase 3 cache uses Drift/SQLite. Run `dart run build_runner build` after changing Drift table definitions. Access and refresh tokens remain in secure storage; Drift stores only course content, local progress, and pending sync operations.
+The mobile app is local-first: do not add a mandatory token check to startup, onboarding, courses, placement, or local progress. Account connection belongs in Settings. Use `docs/LOCAL_FIRST_ACCOUNT_FLOW.md` when changing migration, logout, reset, or capability behavior.

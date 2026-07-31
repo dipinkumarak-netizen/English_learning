@@ -7,3 +7,4 @@ Supported modes include free conversation, beginner conversation, grammar correc
 The deterministic mock provider is enabled only with `AI_PROVIDER_ENABLED=true` and `AI_PROVIDER=mock`. A real provider adapter belongs behind `TextGenerationProvider`; keys belong only in backend environment variables. The default configuration is disabled and does not block backend startup.
 
 Conversations are private and hard-deleted with their messages, corrections, and summaries. Message submission uses client operation IDs to prevent duplicate learner messages and duplicate provider requests.
+AI Tutor is an authenticated server capability. Local users are shown a sign-in/create-account prompt and cannot call anonymous AI endpoints. Cached tutor content is never used to bypass ownership checks and is cleared by the explicit local reset action.

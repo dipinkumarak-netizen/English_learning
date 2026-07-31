@@ -114,6 +114,32 @@ class ProfileUpdate(BaseModel):
     learning_goals: list[Goals] | None = None
     difficult_areas: list[Areas] | None = None
     display_name: str | None = Field(default=None, max_length=120)
+    onboarding_complete: bool | None = None
+
+
+class LocalImportProgress(BaseModel):
+    client_operation_id: str = Field(min_length=8, max_length=80)
+    operation_type: Literal["start_lesson", "complete_step", "submit_exercise", "complete_lesson"]
+    entity_id: str = Field(min_length=1, max_length=80)
+    payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class LocalImportRequest(BaseModel):
+    client_import_operation_id: str = Field(min_length=8, max_length=80)
+    mode: Literal["merge", "account"] = "merge"
+    profile: ProfileUpdate = Field(default_factory=ProfileUpdate)
+    progress: list[LocalImportProgress] = Field(default_factory=list, max_length=500)
+
+
+class LocalImportResponse(BaseModel):
+    import_operation_id: str
+    imported_entities: list[str]
+    merged_entities: list[str]
+    skipped_entities: list[str]
+    conflicts: list[dict[str, Any]]
+    warnings: list[str]
+    final_profile_state: ProfileResponse
+    final_progress_summary: dict[str, Any]
 
 
 class OnboardingProgressRequest(BaseModel):

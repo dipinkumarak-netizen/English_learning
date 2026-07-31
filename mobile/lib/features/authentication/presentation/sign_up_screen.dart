@@ -109,7 +109,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       await ref
           .read(authStateProvider.notifier)
           .signUp(_email.text.trim(), _password.text, _name.text.trim());
-      if (mounted) context.go('/onboarding');
+      if (mounted) context.go('/migration');
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(

@@ -3950,6 +3950,820 @@ class TutorDraftsCompanion extends UpdateCompanion<TutorDraft> {
   }
 }
 
+class $LocalLearnerProfilesTable extends LocalLearnerProfiles
+    with TableInfo<$LocalLearnerProfilesTable, LocalLearnerProfile> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalLearnerProfilesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _displayNameMeta = const VerificationMeta(
+    'displayName',
+  );
+  @override
+  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
+    'display_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('Learner'),
+  );
+  static const VerificationMeta _nativeLanguageMeta = const VerificationMeta(
+    'nativeLanguage',
+  );
+  @override
+  late final GeneratedColumn<String> nativeLanguage = GeneratedColumn<String>(
+    'native_language',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('ml'),
+  );
+  static const VerificationMeta _explanationLanguageMeta =
+      const VerificationMeta('explanationLanguage');
+  @override
+  late final GeneratedColumn<String> explanationLanguage =
+      GeneratedColumn<String>(
+        'explanation_language',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('ml'),
+      );
+  static const VerificationMeta _confidenceLevelMeta = const VerificationMeta(
+    'confidenceLevel',
+  );
+  @override
+  late final GeneratedColumn<String> confidenceLevel = GeneratedColumn<String>(
+    'confidence_level',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _learningGoalsMeta = const VerificationMeta(
+    'learningGoals',
+  );
+  @override
+  late final GeneratedColumn<String> learningGoals = GeneratedColumn<String>(
+    'learning_goals',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _difficultAreasMeta = const VerificationMeta(
+    'difficultAreas',
+  );
+  @override
+  late final GeneratedColumn<String> difficultAreas = GeneratedColumn<String>(
+    'difficult_areas',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _dailyStudyMinutesMeta = const VerificationMeta(
+    'dailyStudyMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> dailyStudyMinutes = GeneratedColumn<int>(
+    'daily_study_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _onboardingCompleteMeta =
+      const VerificationMeta('onboardingComplete');
+  @override
+  late final GeneratedColumn<bool> onboardingComplete = GeneratedColumn<bool>(
+    'onboarding_complete',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("onboarding_complete" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _placementResultMeta = const VerificationMeta(
+    'placementResult',
+  );
+  @override
+  late final GeneratedColumn<String> placementResult = GeneratedColumn<String>(
+    'placement_result',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _learningPlanSummaryMeta =
+      const VerificationMeta('learningPlanSummary');
+  @override
+  late final GeneratedColumn<String> learningPlanSummary =
+      GeneratedColumn<String>(
+        'learning_plan_summary',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    displayName,
+    nativeLanguage,
+    explanationLanguage,
+    confidenceLevel,
+    learningGoals,
+    difficultAreas,
+    dailyStudyMinutes,
+    onboardingComplete,
+    placementResult,
+    learningPlanSummary,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_learner_profiles';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LocalLearnerProfile> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('display_name')) {
+      context.handle(
+        _displayNameMeta,
+        displayName.isAcceptableOrUnknown(
+          data['display_name']!,
+          _displayNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('native_language')) {
+      context.handle(
+        _nativeLanguageMeta,
+        nativeLanguage.isAcceptableOrUnknown(
+          data['native_language']!,
+          _nativeLanguageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('explanation_language')) {
+      context.handle(
+        _explanationLanguageMeta,
+        explanationLanguage.isAcceptableOrUnknown(
+          data['explanation_language']!,
+          _explanationLanguageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('confidence_level')) {
+      context.handle(
+        _confidenceLevelMeta,
+        confidenceLevel.isAcceptableOrUnknown(
+          data['confidence_level']!,
+          _confidenceLevelMeta,
+        ),
+      );
+    }
+    if (data.containsKey('learning_goals')) {
+      context.handle(
+        _learningGoalsMeta,
+        learningGoals.isAcceptableOrUnknown(
+          data['learning_goals']!,
+          _learningGoalsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('difficult_areas')) {
+      context.handle(
+        _difficultAreasMeta,
+        difficultAreas.isAcceptableOrUnknown(
+          data['difficult_areas']!,
+          _difficultAreasMeta,
+        ),
+      );
+    }
+    if (data.containsKey('daily_study_minutes')) {
+      context.handle(
+        _dailyStudyMinutesMeta,
+        dailyStudyMinutes.isAcceptableOrUnknown(
+          data['daily_study_minutes']!,
+          _dailyStudyMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('onboarding_complete')) {
+      context.handle(
+        _onboardingCompleteMeta,
+        onboardingComplete.isAcceptableOrUnknown(
+          data['onboarding_complete']!,
+          _onboardingCompleteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('placement_result')) {
+      context.handle(
+        _placementResultMeta,
+        placementResult.isAcceptableOrUnknown(
+          data['placement_result']!,
+          _placementResultMeta,
+        ),
+      );
+    }
+    if (data.containsKey('learning_plan_summary')) {
+      context.handle(
+        _learningPlanSummaryMeta,
+        learningPlanSummary.isAcceptableOrUnknown(
+          data['learning_plan_summary']!,
+          _learningPlanSummaryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LocalLearnerProfile map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalLearnerProfile(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      displayName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}display_name'],
+      )!,
+      nativeLanguage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}native_language'],
+      )!,
+      explanationLanguage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}explanation_language'],
+      )!,
+      confidenceLevel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}confidence_level'],
+      ),
+      learningGoals: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}learning_goals'],
+      )!,
+      difficultAreas: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}difficult_areas'],
+      )!,
+      dailyStudyMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}daily_study_minutes'],
+      ),
+      onboardingComplete: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}onboarding_complete'],
+      )!,
+      placementResult: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}placement_result'],
+      ),
+      learningPlanSummary: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}learning_plan_summary'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $LocalLearnerProfilesTable createAlias(String alias) {
+    return $LocalLearnerProfilesTable(attachedDatabase, alias);
+  }
+}
+
+class LocalLearnerProfile extends DataClass
+    implements Insertable<LocalLearnerProfile> {
+  final String id;
+  final String displayName;
+  final String nativeLanguage;
+  final String explanationLanguage;
+  final String? confidenceLevel;
+  final String learningGoals;
+  final String difficultAreas;
+  final int? dailyStudyMinutes;
+  final bool onboardingComplete;
+  final String? placementResult;
+  final String? learningPlanSummary;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const LocalLearnerProfile({
+    required this.id,
+    required this.displayName,
+    required this.nativeLanguage,
+    required this.explanationLanguage,
+    this.confidenceLevel,
+    required this.learningGoals,
+    required this.difficultAreas,
+    this.dailyStudyMinutes,
+    required this.onboardingComplete,
+    this.placementResult,
+    this.learningPlanSummary,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['display_name'] = Variable<String>(displayName);
+    map['native_language'] = Variable<String>(nativeLanguage);
+    map['explanation_language'] = Variable<String>(explanationLanguage);
+    if (!nullToAbsent || confidenceLevel != null) {
+      map['confidence_level'] = Variable<String>(confidenceLevel);
+    }
+    map['learning_goals'] = Variable<String>(learningGoals);
+    map['difficult_areas'] = Variable<String>(difficultAreas);
+    if (!nullToAbsent || dailyStudyMinutes != null) {
+      map['daily_study_minutes'] = Variable<int>(dailyStudyMinutes);
+    }
+    map['onboarding_complete'] = Variable<bool>(onboardingComplete);
+    if (!nullToAbsent || placementResult != null) {
+      map['placement_result'] = Variable<String>(placementResult);
+    }
+    if (!nullToAbsent || learningPlanSummary != null) {
+      map['learning_plan_summary'] = Variable<String>(learningPlanSummary);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  LocalLearnerProfilesCompanion toCompanion(bool nullToAbsent) {
+    return LocalLearnerProfilesCompanion(
+      id: Value(id),
+      displayName: Value(displayName),
+      nativeLanguage: Value(nativeLanguage),
+      explanationLanguage: Value(explanationLanguage),
+      confidenceLevel: confidenceLevel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(confidenceLevel),
+      learningGoals: Value(learningGoals),
+      difficultAreas: Value(difficultAreas),
+      dailyStudyMinutes: dailyStudyMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dailyStudyMinutes),
+      onboardingComplete: Value(onboardingComplete),
+      placementResult: placementResult == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placementResult),
+      learningPlanSummary: learningPlanSummary == null && nullToAbsent
+          ? const Value.absent()
+          : Value(learningPlanSummary),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory LocalLearnerProfile.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LocalLearnerProfile(
+      id: serializer.fromJson<String>(json['id']),
+      displayName: serializer.fromJson<String>(json['displayName']),
+      nativeLanguage: serializer.fromJson<String>(json['nativeLanguage']),
+      explanationLanguage: serializer.fromJson<String>(
+        json['explanationLanguage'],
+      ),
+      confidenceLevel: serializer.fromJson<String?>(json['confidenceLevel']),
+      learningGoals: serializer.fromJson<String>(json['learningGoals']),
+      difficultAreas: serializer.fromJson<String>(json['difficultAreas']),
+      dailyStudyMinutes: serializer.fromJson<int?>(json['dailyStudyMinutes']),
+      onboardingComplete: serializer.fromJson<bool>(json['onboardingComplete']),
+      placementResult: serializer.fromJson<String?>(json['placementResult']),
+      learningPlanSummary: serializer.fromJson<String?>(
+        json['learningPlanSummary'],
+      ),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'displayName': serializer.toJson<String>(displayName),
+      'nativeLanguage': serializer.toJson<String>(nativeLanguage),
+      'explanationLanguage': serializer.toJson<String>(explanationLanguage),
+      'confidenceLevel': serializer.toJson<String?>(confidenceLevel),
+      'learningGoals': serializer.toJson<String>(learningGoals),
+      'difficultAreas': serializer.toJson<String>(difficultAreas),
+      'dailyStudyMinutes': serializer.toJson<int?>(dailyStudyMinutes),
+      'onboardingComplete': serializer.toJson<bool>(onboardingComplete),
+      'placementResult': serializer.toJson<String?>(placementResult),
+      'learningPlanSummary': serializer.toJson<String?>(learningPlanSummary),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  LocalLearnerProfile copyWith({
+    String? id,
+    String? displayName,
+    String? nativeLanguage,
+    String? explanationLanguage,
+    Value<String?> confidenceLevel = const Value.absent(),
+    String? learningGoals,
+    String? difficultAreas,
+    Value<int?> dailyStudyMinutes = const Value.absent(),
+    bool? onboardingComplete,
+    Value<String?> placementResult = const Value.absent(),
+    Value<String?> learningPlanSummary = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => LocalLearnerProfile(
+    id: id ?? this.id,
+    displayName: displayName ?? this.displayName,
+    nativeLanguage: nativeLanguage ?? this.nativeLanguage,
+    explanationLanguage: explanationLanguage ?? this.explanationLanguage,
+    confidenceLevel: confidenceLevel.present
+        ? confidenceLevel.value
+        : this.confidenceLevel,
+    learningGoals: learningGoals ?? this.learningGoals,
+    difficultAreas: difficultAreas ?? this.difficultAreas,
+    dailyStudyMinutes: dailyStudyMinutes.present
+        ? dailyStudyMinutes.value
+        : this.dailyStudyMinutes,
+    onboardingComplete: onboardingComplete ?? this.onboardingComplete,
+    placementResult: placementResult.present
+        ? placementResult.value
+        : this.placementResult,
+    learningPlanSummary: learningPlanSummary.present
+        ? learningPlanSummary.value
+        : this.learningPlanSummary,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  LocalLearnerProfile copyWithCompanion(LocalLearnerProfilesCompanion data) {
+    return LocalLearnerProfile(
+      id: data.id.present ? data.id.value : this.id,
+      displayName: data.displayName.present
+          ? data.displayName.value
+          : this.displayName,
+      nativeLanguage: data.nativeLanguage.present
+          ? data.nativeLanguage.value
+          : this.nativeLanguage,
+      explanationLanguage: data.explanationLanguage.present
+          ? data.explanationLanguage.value
+          : this.explanationLanguage,
+      confidenceLevel: data.confidenceLevel.present
+          ? data.confidenceLevel.value
+          : this.confidenceLevel,
+      learningGoals: data.learningGoals.present
+          ? data.learningGoals.value
+          : this.learningGoals,
+      difficultAreas: data.difficultAreas.present
+          ? data.difficultAreas.value
+          : this.difficultAreas,
+      dailyStudyMinutes: data.dailyStudyMinutes.present
+          ? data.dailyStudyMinutes.value
+          : this.dailyStudyMinutes,
+      onboardingComplete: data.onboardingComplete.present
+          ? data.onboardingComplete.value
+          : this.onboardingComplete,
+      placementResult: data.placementResult.present
+          ? data.placementResult.value
+          : this.placementResult,
+      learningPlanSummary: data.learningPlanSummary.present
+          ? data.learningPlanSummary.value
+          : this.learningPlanSummary,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalLearnerProfile(')
+          ..write('id: $id, ')
+          ..write('displayName: $displayName, ')
+          ..write('nativeLanguage: $nativeLanguage, ')
+          ..write('explanationLanguage: $explanationLanguage, ')
+          ..write('confidenceLevel: $confidenceLevel, ')
+          ..write('learningGoals: $learningGoals, ')
+          ..write('difficultAreas: $difficultAreas, ')
+          ..write('dailyStudyMinutes: $dailyStudyMinutes, ')
+          ..write('onboardingComplete: $onboardingComplete, ')
+          ..write('placementResult: $placementResult, ')
+          ..write('learningPlanSummary: $learningPlanSummary, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    displayName,
+    nativeLanguage,
+    explanationLanguage,
+    confidenceLevel,
+    learningGoals,
+    difficultAreas,
+    dailyStudyMinutes,
+    onboardingComplete,
+    placementResult,
+    learningPlanSummary,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LocalLearnerProfile &&
+          other.id == this.id &&
+          other.displayName == this.displayName &&
+          other.nativeLanguage == this.nativeLanguage &&
+          other.explanationLanguage == this.explanationLanguage &&
+          other.confidenceLevel == this.confidenceLevel &&
+          other.learningGoals == this.learningGoals &&
+          other.difficultAreas == this.difficultAreas &&
+          other.dailyStudyMinutes == this.dailyStudyMinutes &&
+          other.onboardingComplete == this.onboardingComplete &&
+          other.placementResult == this.placementResult &&
+          other.learningPlanSummary == this.learningPlanSummary &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class LocalLearnerProfilesCompanion
+    extends UpdateCompanion<LocalLearnerProfile> {
+  final Value<String> id;
+  final Value<String> displayName;
+  final Value<String> nativeLanguage;
+  final Value<String> explanationLanguage;
+  final Value<String?> confidenceLevel;
+  final Value<String> learningGoals;
+  final Value<String> difficultAreas;
+  final Value<int?> dailyStudyMinutes;
+  final Value<bool> onboardingComplete;
+  final Value<String?> placementResult;
+  final Value<String?> learningPlanSummary;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const LocalLearnerProfilesCompanion({
+    this.id = const Value.absent(),
+    this.displayName = const Value.absent(),
+    this.nativeLanguage = const Value.absent(),
+    this.explanationLanguage = const Value.absent(),
+    this.confidenceLevel = const Value.absent(),
+    this.learningGoals = const Value.absent(),
+    this.difficultAreas = const Value.absent(),
+    this.dailyStudyMinutes = const Value.absent(),
+    this.onboardingComplete = const Value.absent(),
+    this.placementResult = const Value.absent(),
+    this.learningPlanSummary = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LocalLearnerProfilesCompanion.insert({
+    required String id,
+    this.displayName = const Value.absent(),
+    this.nativeLanguage = const Value.absent(),
+    this.explanationLanguage = const Value.absent(),
+    this.confidenceLevel = const Value.absent(),
+    this.learningGoals = const Value.absent(),
+    this.difficultAreas = const Value.absent(),
+    this.dailyStudyMinutes = const Value.absent(),
+    this.onboardingComplete = const Value.absent(),
+    this.placementResult = const Value.absent(),
+    this.learningPlanSummary = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<LocalLearnerProfile> custom({
+    Expression<String>? id,
+    Expression<String>? displayName,
+    Expression<String>? nativeLanguage,
+    Expression<String>? explanationLanguage,
+    Expression<String>? confidenceLevel,
+    Expression<String>? learningGoals,
+    Expression<String>? difficultAreas,
+    Expression<int>? dailyStudyMinutes,
+    Expression<bool>? onboardingComplete,
+    Expression<String>? placementResult,
+    Expression<String>? learningPlanSummary,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (displayName != null) 'display_name': displayName,
+      if (nativeLanguage != null) 'native_language': nativeLanguage,
+      if (explanationLanguage != null)
+        'explanation_language': explanationLanguage,
+      if (confidenceLevel != null) 'confidence_level': confidenceLevel,
+      if (learningGoals != null) 'learning_goals': learningGoals,
+      if (difficultAreas != null) 'difficult_areas': difficultAreas,
+      if (dailyStudyMinutes != null) 'daily_study_minutes': dailyStudyMinutes,
+      if (onboardingComplete != null) 'onboarding_complete': onboardingComplete,
+      if (placementResult != null) 'placement_result': placementResult,
+      if (learningPlanSummary != null)
+        'learning_plan_summary': learningPlanSummary,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LocalLearnerProfilesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? displayName,
+    Value<String>? nativeLanguage,
+    Value<String>? explanationLanguage,
+    Value<String?>? confidenceLevel,
+    Value<String>? learningGoals,
+    Value<String>? difficultAreas,
+    Value<int?>? dailyStudyMinutes,
+    Value<bool>? onboardingComplete,
+    Value<String?>? placementResult,
+    Value<String?>? learningPlanSummary,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return LocalLearnerProfilesCompanion(
+      id: id ?? this.id,
+      displayName: displayName ?? this.displayName,
+      nativeLanguage: nativeLanguage ?? this.nativeLanguage,
+      explanationLanguage: explanationLanguage ?? this.explanationLanguage,
+      confidenceLevel: confidenceLevel ?? this.confidenceLevel,
+      learningGoals: learningGoals ?? this.learningGoals,
+      difficultAreas: difficultAreas ?? this.difficultAreas,
+      dailyStudyMinutes: dailyStudyMinutes ?? this.dailyStudyMinutes,
+      onboardingComplete: onboardingComplete ?? this.onboardingComplete,
+      placementResult: placementResult ?? this.placementResult,
+      learningPlanSummary: learningPlanSummary ?? this.learningPlanSummary,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (displayName.present) {
+      map['display_name'] = Variable<String>(displayName.value);
+    }
+    if (nativeLanguage.present) {
+      map['native_language'] = Variable<String>(nativeLanguage.value);
+    }
+    if (explanationLanguage.present) {
+      map['explanation_language'] = Variable<String>(explanationLanguage.value);
+    }
+    if (confidenceLevel.present) {
+      map['confidence_level'] = Variable<String>(confidenceLevel.value);
+    }
+    if (learningGoals.present) {
+      map['learning_goals'] = Variable<String>(learningGoals.value);
+    }
+    if (difficultAreas.present) {
+      map['difficult_areas'] = Variable<String>(difficultAreas.value);
+    }
+    if (dailyStudyMinutes.present) {
+      map['daily_study_minutes'] = Variable<int>(dailyStudyMinutes.value);
+    }
+    if (onboardingComplete.present) {
+      map['onboarding_complete'] = Variable<bool>(onboardingComplete.value);
+    }
+    if (placementResult.present) {
+      map['placement_result'] = Variable<String>(placementResult.value);
+    }
+    if (learningPlanSummary.present) {
+      map['learning_plan_summary'] = Variable<String>(
+        learningPlanSummary.value,
+      );
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalLearnerProfilesCompanion(')
+          ..write('id: $id, ')
+          ..write('displayName: $displayName, ')
+          ..write('nativeLanguage: $nativeLanguage, ')
+          ..write('explanationLanguage: $explanationLanguage, ')
+          ..write('confidenceLevel: $confidenceLevel, ')
+          ..write('learningGoals: $learningGoals, ')
+          ..write('difficultAreas: $difficultAreas, ')
+          ..write('dailyStudyMinutes: $dailyStudyMinutes, ')
+          ..write('onboardingComplete: $onboardingComplete, ')
+          ..write('placementResult: $placementResult, ')
+          ..write('learningPlanSummary: $learningPlanSummary, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3972,6 +4786,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CachedTutorSummariesTable cachedTutorSummaries =
       $CachedTutorSummariesTable(this);
   late final $TutorDraftsTable tutorDrafts = $TutorDraftsTable(this);
+  late final $LocalLearnerProfilesTable localLearnerProfiles =
+      $LocalLearnerProfilesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3989,6 +4805,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     cachedTutorMistakes,
     cachedTutorSummaries,
     tutorDrafts,
+    localLearnerProfiles,
   ];
 }
 
@@ -6347,6 +7164,394 @@ typedef $$TutorDraftsTableProcessedTableManager =
       TutorDraft,
       PrefetchHooks Function()
     >;
+typedef $$LocalLearnerProfilesTableCreateCompanionBuilder =
+    LocalLearnerProfilesCompanion Function({
+      required String id,
+      Value<String> displayName,
+      Value<String> nativeLanguage,
+      Value<String> explanationLanguage,
+      Value<String?> confidenceLevel,
+      Value<String> learningGoals,
+      Value<String> difficultAreas,
+      Value<int?> dailyStudyMinutes,
+      Value<bool> onboardingComplete,
+      Value<String?> placementResult,
+      Value<String?> learningPlanSummary,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$LocalLearnerProfilesTableUpdateCompanionBuilder =
+    LocalLearnerProfilesCompanion Function({
+      Value<String> id,
+      Value<String> displayName,
+      Value<String> nativeLanguage,
+      Value<String> explanationLanguage,
+      Value<String?> confidenceLevel,
+      Value<String> learningGoals,
+      Value<String> difficultAreas,
+      Value<int?> dailyStudyMinutes,
+      Value<bool> onboardingComplete,
+      Value<String?> placementResult,
+      Value<String?> learningPlanSummary,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$LocalLearnerProfilesTableFilterComposer
+    extends Composer<_$AppDatabase, $LocalLearnerProfilesTable> {
+  $$LocalLearnerProfilesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nativeLanguage => $composableBuilder(
+    column: $table.nativeLanguage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get explanationLanguage => $composableBuilder(
+    column: $table.explanationLanguage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get confidenceLevel => $composableBuilder(
+    column: $table.confidenceLevel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get learningGoals => $composableBuilder(
+    column: $table.learningGoals,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get difficultAreas => $composableBuilder(
+    column: $table.difficultAreas,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dailyStudyMinutes => $composableBuilder(
+    column: $table.dailyStudyMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get onboardingComplete => $composableBuilder(
+    column: $table.onboardingComplete,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get placementResult => $composableBuilder(
+    column: $table.placementResult,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get learningPlanSummary => $composableBuilder(
+    column: $table.learningPlanSummary,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LocalLearnerProfilesTableOrderingComposer
+    extends Composer<_$AppDatabase, $LocalLearnerProfilesTable> {
+  $$LocalLearnerProfilesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nativeLanguage => $composableBuilder(
+    column: $table.nativeLanguage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get explanationLanguage => $composableBuilder(
+    column: $table.explanationLanguage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get confidenceLevel => $composableBuilder(
+    column: $table.confidenceLevel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get learningGoals => $composableBuilder(
+    column: $table.learningGoals,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get difficultAreas => $composableBuilder(
+    column: $table.difficultAreas,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dailyStudyMinutes => $composableBuilder(
+    column: $table.dailyStudyMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get onboardingComplete => $composableBuilder(
+    column: $table.onboardingComplete,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get placementResult => $composableBuilder(
+    column: $table.placementResult,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get learningPlanSummary => $composableBuilder(
+    column: $table.learningPlanSummary,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LocalLearnerProfilesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LocalLearnerProfilesTable> {
+  $$LocalLearnerProfilesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nativeLanguage => $composableBuilder(
+    column: $table.nativeLanguage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get explanationLanguage => $composableBuilder(
+    column: $table.explanationLanguage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get confidenceLevel => $composableBuilder(
+    column: $table.confidenceLevel,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get learningGoals => $composableBuilder(
+    column: $table.learningGoals,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get difficultAreas => $composableBuilder(
+    column: $table.difficultAreas,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get dailyStudyMinutes => $composableBuilder(
+    column: $table.dailyStudyMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get onboardingComplete => $composableBuilder(
+    column: $table.onboardingComplete,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get placementResult => $composableBuilder(
+    column: $table.placementResult,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get learningPlanSummary => $composableBuilder(
+    column: $table.learningPlanSummary,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$LocalLearnerProfilesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LocalLearnerProfilesTable,
+          LocalLearnerProfile,
+          $$LocalLearnerProfilesTableFilterComposer,
+          $$LocalLearnerProfilesTableOrderingComposer,
+          $$LocalLearnerProfilesTableAnnotationComposer,
+          $$LocalLearnerProfilesTableCreateCompanionBuilder,
+          $$LocalLearnerProfilesTableUpdateCompanionBuilder,
+          (
+            LocalLearnerProfile,
+            BaseReferences<
+              _$AppDatabase,
+              $LocalLearnerProfilesTable,
+              LocalLearnerProfile
+            >,
+          ),
+          LocalLearnerProfile,
+          PrefetchHooks Function()
+        > {
+  $$LocalLearnerProfilesTableTableManager(
+    _$AppDatabase db,
+    $LocalLearnerProfilesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LocalLearnerProfilesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LocalLearnerProfilesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$LocalLearnerProfilesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> displayName = const Value.absent(),
+                Value<String> nativeLanguage = const Value.absent(),
+                Value<String> explanationLanguage = const Value.absent(),
+                Value<String?> confidenceLevel = const Value.absent(),
+                Value<String> learningGoals = const Value.absent(),
+                Value<String> difficultAreas = const Value.absent(),
+                Value<int?> dailyStudyMinutes = const Value.absent(),
+                Value<bool> onboardingComplete = const Value.absent(),
+                Value<String?> placementResult = const Value.absent(),
+                Value<String?> learningPlanSummary = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LocalLearnerProfilesCompanion(
+                id: id,
+                displayName: displayName,
+                nativeLanguage: nativeLanguage,
+                explanationLanguage: explanationLanguage,
+                confidenceLevel: confidenceLevel,
+                learningGoals: learningGoals,
+                difficultAreas: difficultAreas,
+                dailyStudyMinutes: dailyStudyMinutes,
+                onboardingComplete: onboardingComplete,
+                placementResult: placementResult,
+                learningPlanSummary: learningPlanSummary,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String> displayName = const Value.absent(),
+                Value<String> nativeLanguage = const Value.absent(),
+                Value<String> explanationLanguage = const Value.absent(),
+                Value<String?> confidenceLevel = const Value.absent(),
+                Value<String> learningGoals = const Value.absent(),
+                Value<String> difficultAreas = const Value.absent(),
+                Value<int?> dailyStudyMinutes = const Value.absent(),
+                Value<bool> onboardingComplete = const Value.absent(),
+                Value<String?> placementResult = const Value.absent(),
+                Value<String?> learningPlanSummary = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => LocalLearnerProfilesCompanion.insert(
+                id: id,
+                displayName: displayName,
+                nativeLanguage: nativeLanguage,
+                explanationLanguage: explanationLanguage,
+                confidenceLevel: confidenceLevel,
+                learningGoals: learningGoals,
+                difficultAreas: difficultAreas,
+                dailyStudyMinutes: dailyStudyMinutes,
+                onboardingComplete: onboardingComplete,
+                placementResult: placementResult,
+                learningPlanSummary: learningPlanSummary,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LocalLearnerProfilesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LocalLearnerProfilesTable,
+      LocalLearnerProfile,
+      $$LocalLearnerProfilesTableFilterComposer,
+      $$LocalLearnerProfilesTableOrderingComposer,
+      $$LocalLearnerProfilesTableAnnotationComposer,
+      $$LocalLearnerProfilesTableCreateCompanionBuilder,
+      $$LocalLearnerProfilesTableUpdateCompanionBuilder,
+      (
+        LocalLearnerProfile,
+        BaseReferences<
+          _$AppDatabase,
+          $LocalLearnerProfilesTable,
+          LocalLearnerProfile
+        >,
+      ),
+      LocalLearnerProfile,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6378,4 +7583,6 @@ class $AppDatabaseManager {
       $$CachedTutorSummariesTableTableManager(_db, _db.cachedTutorSummaries);
   $$TutorDraftsTableTableManager get tutorDrafts =>
       $$TutorDraftsTableTableManager(_db, _db.tutorDrafts);
+  $$LocalLearnerProfilesTableTableManager get localLearnerProfiles =>
+      $$LocalLearnerProfilesTableTableManager(_db, _db.localLearnerProfiles);
 }

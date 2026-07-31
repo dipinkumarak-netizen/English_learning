@@ -20,6 +20,11 @@ class HomeScreen extends ConsumerWidget {
             onPressed: () => context.go('/profile'),
             icon: const Icon(Icons.person_outline),
           ),
+          IconButton(
+            tooltip: 'Settings',
+            onPressed: () => context.go('/settings'),
+            icon: const Icon(Icons.settings_outlined),
+          ),
         ],
       ),
       body: ListView(
@@ -46,7 +51,13 @@ class HomeScreen extends ConsumerWidget {
               subtitle: const Text(
                 'Practise with secure text-only learning support.',
               ),
-              onTap: () => context.go('/tutor'),
+              onTap: () {
+                if (ref.read(authStateProvider).isAuthenticated) {
+                  context.go('/tutor');
+                } else {
+                  _showTutorSignIn(context);
+                }
+              },
             ),
           ),
           const SizedBox(height: 12),
@@ -78,10 +89,50 @@ class HomeScreen extends ConsumerWidget {
               onTap: () => context.go('/placement'),
             ),
           ),
-          const SizedBox(height: 24),
+          if (!ref.watch(authStateProvider).isAuthenticated) ...[
+            const SizedBox(height: 24),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.cloud_upload_outlined),
+                title: const Text('Back up your progress'),
+                subtitle: const Text(
+                  'Sign in to sync lessons and use the AI Tutor.',
+                ),
+                onTap: () => context.go('/settings'),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _showTutorSignIn(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sign in to use the AI Tutor'),
+        content: const Text(
+          'The AI Tutor uses the secure NilaSpeak backend to generate responses and save tutor history.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Not now'),
+          ),
           OutlinedButton(
-            onPressed: () => ref.read(authStateProvider.notifier).signOut(),
-            child: Text(l10n.logout),
+            onPressed: () {
+              Navigator.pop(context);
+              context.go('/signup');
+            },
+            child: const Text('Create account'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.go('/signin');
+            },
+            child: const Text('Sign in'),
           ),
         ],
       ),

@@ -19,6 +19,8 @@ import '../../features/courses/presentation/progress_summary_screen.dart';
 import '../../features/tutor/presentation/mistake_notebook_screen.dart';
 import '../../features/tutor/presentation/tutor_chat_screen.dart';
 import '../../features/tutor/presentation/tutor_home_screen.dart';
+import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/settings/presentation/migration_screen.dart';
 import 'route_names.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -30,16 +32,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (auth.status == AuthStatus.loading) {
         return location == '/splash' ? null : '/splash';
       }
-      final publicRoutes = {'/splash', '/auth', '/signin', '/signup'};
-      if (auth.status == AuthStatus.signedOut) {
-        return publicRoutes.contains(location) ? null : '/auth';
-      }
-      if (publicRoutes.contains(location)) {
-        return auth.onboardingComplete ? '/home' : '/onboarding';
+      if (location == '/splash') return null;
+      if (location == '/auth' ||
+          location == '/signin' ||
+          location == '/signup') {
+        return auth.isAuthenticated ? '/home' : null;
       }
       if (!auth.onboardingComplete &&
           location != '/onboarding' &&
-          location != '/placement') {
+          location != '/placement' &&
+          location != '/settings' &&
+          location != '/migration') {
         return '/onboarding';
       }
       return null;
@@ -58,6 +61,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
       GoRoute(path: '/placement', builder: (_, _) => const PlacementScreen()),
       GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
+      GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+      GoRoute(path: '/migration', builder: (_, _) => const MigrationScreen()),
       GoRoute(
         path: '/learning-plan',
         builder: (_, _) => const LearningPlanScreen(),

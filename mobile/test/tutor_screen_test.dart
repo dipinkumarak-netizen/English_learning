@@ -5,8 +5,18 @@ import 'package:nilaspeak_mobile/features/tutor/presentation/mistake_notebook_sc
 import 'package:nilaspeak_mobile/features/tutor/presentation/tutor_chat_screen.dart';
 import 'package:nilaspeak_mobile/features/tutor/presentation/tutor_home_screen.dart';
 import 'package:nilaspeak_mobile/features/tutor/presentation/tutor_providers.dart';
+import 'package:nilaspeak_mobile/features/authentication/presentation/auth_controller.dart';
 
 void main() {
+  testWidgets('local tutor requires sign-in', (tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(child: MaterialApp(home: TutorHomeScreen())),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Sign in to use the AI Tutor'), findsOneWidget);
+    expect(find.text('Not now'), findsOneWidget);
+  });
+
   testWidgets('tutor home renders usage and new-practice controls', (
     tester,
   ) async {
@@ -17,6 +27,17 @@ void main() {
           tutorUsageProvider.overrideWith(
             (_) async => {'requests_today': 1, 'daily_request_limit': 50},
           ),
+          authStateProvider.overrideWith((ref) {
+            final controller = AuthController(
+              ref.read(authRepositoryProvider),
+              ref.read(databaseProvider),
+            );
+            controller.state = const AuthState(
+              status: AuthStatus.signedIn,
+              onboardingComplete: true,
+            );
+            return controller;
+          }),
         ],
         child: const MaterialApp(home: TutorHomeScreen()),
       ),

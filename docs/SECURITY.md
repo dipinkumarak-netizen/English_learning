@@ -16,3 +16,4 @@
 - Audio will later require consent, MIME/size/duration limits, short retention, and deletion. Raw voice will not be retained by default.
 - Subscription, payment, billing, entitlement, trial, and promotional-access systems are permanently removed from the private-use scope.
 - Application UI language is English-only. Malayalam learning explanations are domain content and are not loaded through the application-locale system.
+Local learner IDs are random persisted UUIDs, not backend identities or authentication tokens. Local mode has no authentication bypass and no fake JWT. The local-import endpoint requires a real authenticated user, validates curriculum references, and recalculates exercise scores server-side. Account deletion and local-data reset are separate actions; logout clears secure tokens while preserving local learning data.

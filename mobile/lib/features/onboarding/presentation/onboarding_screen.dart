@@ -228,7 +228,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     setState(() => _busy = true);
     try {
       final token = await ref.read(tokenStorageProvider).readAccessToken();
-      if (token == null) throw StateError('No session');
       final profile = {
         'native_language': _nativeLanguage,
         'explanation_language': _explanationLanguage,
@@ -237,14 +236,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         'learning_goals': _goals.toList(),
         'difficult_areas': _areas.toList(),
       };
-      await ref
-          .read(apiClientProvider)
-          .post(
-            '/api/v1/onboarding/complete',
-            data: {'profile': profile},
-            accessToken: token,
-          );
-      await ref.read(authStateProvider.notifier).markOnboardingComplete();
+      await ref.read(authStateProvider.notifier).updateLocalProfile({
+        ...profile,
+        'onboarding_complete': true,
+      });
+      if (token != null) {
+        await ref
+            .read(apiClientProvider)
+            .post(
+              '/api/v1/onboarding/complete',
+              data: {'profile': profile},
+              accessToken: token,
+            );
+        await ref.read(authStateProvider.notifier).markOnboardingComplete();
+      } else {
+        await ref
+            .read(authStateProvider.notifier)
+            .markLocalOnboardingComplete();
+      }
       if (mounted) context.go('/placement');
     } catch (_) {
       if (mounted) {

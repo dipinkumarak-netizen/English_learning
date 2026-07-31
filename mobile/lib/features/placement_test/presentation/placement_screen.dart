@@ -19,6 +19,7 @@ class _PlacementScreenState extends ConsumerState<PlacementScreen> {
   String? _attemptId;
   bool _loading = true;
   bool _busy = false;
+  bool _localMode = false;
 
   @override
   void initState() {
@@ -153,7 +154,28 @@ class _PlacementScreenState extends ConsumerState<PlacementScreen> {
   Future<void> _load() async {
     try {
       final token = await ref.read(tokenStorageProvider).readAccessToken();
-      if (token == null) throw StateError('No session');
+      if (token == null) {
+        _localMode = true;
+        _questions = const [
+          {
+            'id': 'local-1',
+            'prompt': 'Choose the correct sentence.',
+            'options': ['I am happy.', 'I happy am.'],
+          },
+          {
+            'id': 'local-2',
+            'prompt': 'Choose the correct word: She ___ to school.',
+            'options': ['go', 'goes'],
+          },
+          {
+            'id': 'local-3',
+            'prompt': 'Choose the natural sentence.',
+            'options': ['I like tea.', 'I tea like.'],
+          },
+        ];
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
       final client = ref.read(apiClientProvider);
       final assessment = await client.get(
         '/api/v1/placement/assessment',
@@ -185,7 +207,33 @@ class _PlacementScreenState extends ConsumerState<PlacementScreen> {
     setState(() => _busy = true);
     try {
       final token = await ref.read(tokenStorageProvider).readAccessToken();
-      if (token == null || _attemptId == null) throw StateError('No session');
+      if (_localMode || token == null) {
+        final correct = {
+          'local-1': 'I am happy.',
+          'local-2': 'goes',
+          'local-3': 'I like tea.',
+        };
+        final raw = _answers.entries
+            .where((entry) => correct[entry.key] == entry.value)
+            .length;
+        final percentage = raw / _questions.length * 100;
+        final level = percentage >= 80
+            ? 'A2'
+            : percentage >= 50
+            ? 'A1'
+            : 'starter';
+        if (mounted) {
+          setState(
+            () => _result = {
+              'estimated_level': level,
+              'percentage': percentage.round(),
+              'recommended_track': 'Everyday English foundations',
+            },
+          );
+        }
+        return;
+      }
+      if (_attemptId == null) throw StateError('No session');
       final client = ref.read(apiClientProvider);
       for (final entry in _answers.entries) {
         await client.put(

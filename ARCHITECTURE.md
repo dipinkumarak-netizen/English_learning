@@ -25,3 +25,4 @@ Flutter formatting, analysis, widget tests, and Android builds run in CI. Backen
 ## Product scope
 
 NilaSpeak is private personal-use software. Subscription, billing, entitlement, trial, purchase, Play Store publishing, and commercial analytics layers are removed from active scope.
+The mobile application uses separate local learner and backend account state. Drift owns structured local profile, course cache, lesson progress, pending sync, and tutor cache; secure storage owns only authentication tokens. GoRouter permits local onboarding and home without authentication. Settings connects an account and invokes authenticated migration/sync capabilities.

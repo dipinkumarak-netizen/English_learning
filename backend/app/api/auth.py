@@ -1,6 +1,6 @@
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -126,6 +126,15 @@ async def logout_all(
     for session in sessions:
         session.revoked_at = now
     await db.commit()
+
+
+@router.delete("/account", status_code=204)
+async def delete_account(
+    user: User = Depends(current_user), db: AsyncSession = Depends(get_db)
+) -> Response:
+    await db.delete(user)
+    await db.commit()
+    return Response(status_code=204)
 
 
 @router.get("/me", response_model=UserPublic)
