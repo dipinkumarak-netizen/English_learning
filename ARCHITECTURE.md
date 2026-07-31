@@ -2,13 +2,13 @@
 
 ## Mobile
 
-Flutter uses a feature-first structure. `app/` owns bootstrap, routing, and app-wide providers. `core/` owns configuration, errors, logging, networking, theme, and reusable widgets. Phase 2 features live under authentication, onboarding, placement_test, learner_profile, and learning_plan. The interface locale is English-only; Malayalam is a learner native/explanation language in domain content, not a Flutter UI locale.
+Flutter uses a feature-first structure. `app/` owns bootstrap, routing, and app-wide providers. `core/` owns configuration, errors, logging, networking, Drift persistence, and reusable widgets. Course features own repositories, Riverpod providers, the course library, lesson details, the lesson player, deterministic exercise rendering, progress summary, and sync services. The interface locale is English-only; Malayalam is a learner native/explanation language in domain content, not a Flutter UI locale.
 
 Riverpod provides dependency injection and state. GoRouter owns navigation and auth/onboarding redirects. Widgets do not construct HTTP details directly.
 
 ## Backend
 
-FastAPI exposes versioned routes. Pydantic validates request/response schemas. SQLAlchemy 2 async and Alembic provide the PostgreSQL foundation. Phase 2 uses Argon2 password hashes, short-lived JWT access tokens, hashed opaque refresh sessions with rotation/revocation, and ownership-scoped private resources. Redis is deferred.
+FastAPI exposes versioned routes. Pydantic validates request/response schemas. SQLAlchemy 2 async and Alembic provide the PostgreSQL foundation. Phase 2 uses Argon2 password hashes, short-lived JWT access tokens, hashed opaque refresh sessions with rotation/revocation, and ownership-scoped private resources. Phase 3 adds Course → Module → Lesson → LessonStep → ExerciseDefinition, learner progress, attempts, and a narrow idempotent sync queue. Redis is deferred.
 
 ## Data flow
 
@@ -16,7 +16,7 @@ Flutter → API client → versioned FastAPI route → database/domain service. 
 
 ## Local persistence
 
-Secure storage holds access and refresh tokens. SharedPreferences holds only a resumable onboarding draft; no application-language preference is stored. The backend is authoritative for accounts, profiles, placement results, and plans. A future structured local database may support course content and queued mutations.
+Secure storage holds access and refresh tokens. SharedPreferences holds only a resumable onboarding draft; no application-language preference is stored. Drift stores versioned course cache, lesson progress, and pending sync operations. The backend is authoritative for published curriculum and final synced progress; local data is authoritative only for unsynced offline work.
 
 ## Testing
 

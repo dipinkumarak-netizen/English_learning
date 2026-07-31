@@ -154,3 +154,146 @@ class LearningPlanResponse(BaseModel):
     explanation_language: str
     plan_version: str
     created_at: datetime | None = None
+
+
+class ExerciseDefinitionResponse(BaseModel):
+    id: str
+    exercise_type: str
+    learner_level: str
+    skill_category: str
+    prompt_en: str
+    support_ml: str | None
+    options: list[Any] | None
+    explanation_en: str
+    explanation_ml: str | None
+    scoring_weight: int
+    max_attempts: int
+    retry_policy: str
+    content_version: int
+
+
+class LessonStepResponse(BaseModel):
+    id: str
+    step_type: str
+    sort_order: int
+    title: str
+    content_en: str
+    explanation_ml: str | None
+    version: int
+    is_required: bool
+    completion_rule: str
+    exercise: ExerciseDefinitionResponse | None = None
+
+
+class LessonSummaryResponse(BaseModel):
+    id: str
+    slug: str
+    title: str
+    summary: str
+    learning_objectives: list[Any]
+    grammar_focus: str
+    vocabulary_focus: list[Any]
+    estimated_minutes: int
+    difficulty: str
+    sort_order: int
+    version: int
+    is_published: bool
+    offline_eligible: bool
+    unlocked: bool = False
+    completed: bool = False
+    score: float = 0
+
+
+class ModuleResponse(BaseModel):
+    id: str
+    title: str
+    description: str
+    sort_order: int
+    estimated_minutes: int
+    unlock_rule: str
+    version: int
+    is_published: bool
+    lessons: list[LessonSummaryResponse] = []
+    unlocked: bool = False
+
+
+class CourseResponse(BaseModel):
+    id: str
+    slug: str
+    title: str
+    short_description: str
+    full_description: str
+    learner_level: str
+    native_language_support: list[Any]
+    explanation_languages: list[Any]
+    estimated_total_minutes: int
+    version: int
+    is_published: bool
+    thumbnail_ref: str | None
+    completion_percentage: float = 0
+    downloaded: bool = False
+    modules: list[ModuleResponse] = []
+
+
+class LessonDetailResponse(LessonSummaryResponse):
+    module_id: str
+    steps: list[LessonStepResponse]
+
+
+class StepProgressRequest(BaseModel):
+    completed: bool = True
+    client_operation_id: str = Field(min_length=8, max_length=80)
+
+
+class ExerciseAttemptRequest(BaseModel):
+    answer: Any
+    client_operation_id: str = Field(min_length=8, max_length=80)
+
+
+class ExerciseAttemptResponse(BaseModel):
+    attempt_id: str
+    is_correct: bool
+    score: float
+    attempt_number: int
+    attempts_remaining: int
+    explanation_en: str
+    explanation_ml: str | None
+    completed: bool
+
+
+class LessonCompletionResponse(BaseModel):
+    lesson_id: str
+    completed: bool
+    score: float
+    completed_exercises: int
+    correct_answers: int
+    incorrect_answers: int
+    attempt_count: int
+    next_lesson_id: str | None
+    vocabulary_reviewed: list[Any]
+    grammar_focus: str
+    completed_at: datetime | None
+
+
+class ProgressSummaryResponse(BaseModel):
+    courses_started: int
+    lessons_completed: int
+    lessons_available: int
+    completion_percentage: float
+    current_lesson_id: str | None
+
+
+class SyncOperationRequest(BaseModel):
+    client_operation_id: str = Field(min_length=8, max_length=80)
+    operation_type: Literal["start_lesson", "complete_step", "submit_exercise", "complete_lesson"]
+    entity_id: str
+    payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class ProgressSyncRequest(BaseModel):
+    operations: list[SyncOperationRequest] = Field(max_length=50)
+
+
+class ProgressSyncResponse(BaseModel):
+    processed: list[str]
+    failed: list[dict[str, str]]

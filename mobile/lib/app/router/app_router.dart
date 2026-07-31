@@ -12,6 +12,10 @@ import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/placement_test/presentation/placement_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/error/presentation/error_screen.dart';
+import '../../features/courses/presentation/course_details_screen.dart';
+import '../../features/courses/presentation/course_library_screen.dart';
+import '../../features/courses/presentation/lesson_player_screen.dart';
+import '../../features/courses/presentation/progress_summary_screen.dart';
 import 'route_names.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -59,6 +63,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: RouteNames.home,
         path: '/home',
         builder: (_, _) => const HomeScreen(),
+      ),
+      GoRoute(path: '/courses', builder: (_, _) => const CourseLibraryScreen()),
+      GoRoute(
+        path: '/courses/:courseId',
+        builder: (_, state) =>
+            CourseDetailsScreen(courseId: state.pathParameters['courseId']!),
+      ),
+      GoRoute(
+        path: '/lessons/:lessonId',
+        builder: (_, state) =>
+            LessonPlayerScreen(lessonId: state.pathParameters['lessonId']!),
+      ),
+      GoRoute(
+        path: '/progress',
+        builder: (_, _) => const ProgressSummaryScreen(),
       ),
     ],
   );

@@ -207,3 +207,180 @@ class LearningPlan(Base):
     plan_version: Mapped[str] = mapped_column(String(20))
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Course(TimestampMixin, Base):
+    __tablename__ = "courses"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    slug: Mapped[str] = mapped_column(String(120), unique=True, index=True)
+    title: Mapped[str] = mapped_column(String(200))
+    short_description: Mapped[str] = mapped_column(String(500))
+    full_description: Mapped[str] = mapped_column(Text)
+    learner_level: Mapped[str] = mapped_column(String(10), default="A1")
+    native_language_support: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    explanation_languages: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    estimated_total_minutes: Mapped[int] = mapped_column(Integer)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    is_published: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    thumbnail_ref: Mapped[str | None] = mapped_column(String(200), nullable=True)
+
+
+class CourseModule(TimestampMixin, Base):
+    __tablename__ = "course_modules"
+    __table_args__ = (UniqueConstraint("course_id", "sort_order"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    course_id: Mapped[str] = mapped_column(ForeignKey("courses.id", ondelete="CASCADE"), index=True)
+    title: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(Text)
+    sort_order: Mapped[int] = mapped_column(Integer)
+    estimated_minutes: Mapped[int] = mapped_column(Integer)
+    unlock_rule: Mapped[str] = mapped_column(String(40), default="previous_module")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    is_published: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+
+
+class Lesson(TimestampMixin, Base):
+    __tablename__ = "lessons"
+    __table_args__ = (UniqueConstraint("module_id", "sort_order"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    module_id: Mapped[str] = mapped_column(
+        ForeignKey("course_modules.id", ondelete="CASCADE"), index=True
+    )
+    slug: Mapped[str] = mapped_column(String(140), unique=True, index=True)
+    title: Mapped[str] = mapped_column(String(200))
+    summary: Mapped[str] = mapped_column(Text)
+    learning_objectives: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    grammar_focus: Mapped[str] = mapped_column(String(160))
+    vocabulary_focus: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    estimated_minutes: Mapped[int] = mapped_column(Integer)
+    difficulty: Mapped[str] = mapped_column(String(20), default="beginner")
+    sort_order: Mapped[int] = mapped_column(Integer)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    is_published: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    prerequisite_lesson_id: Mapped[str | None] = mapped_column(
+        ForeignKey("lessons.id", ondelete="SET NULL"), nullable=True
+    )
+    offline_eligible: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class LessonStep(TimestampMixin, Base):
+    __tablename__ = "lesson_steps"
+    __table_args__ = (UniqueConstraint("lesson_id", "sort_order"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    lesson_id: Mapped[str] = mapped_column(ForeignKey("lessons.id", ondelete="CASCADE"), index=True)
+    step_type: Mapped[str] = mapped_column(String(30))
+    sort_order: Mapped[int] = mapped_column(Integer)
+    title: Mapped[str] = mapped_column(String(200))
+    content_en: Mapped[str] = mapped_column(Text)
+    explanation_ml: Mapped[str | None] = mapped_column(Text, nullable=True)
+    audio_ref: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    is_required: Mapped[bool] = mapped_column(Boolean, default=True)
+    completion_rule: Mapped[str] = mapped_column(String(40), default="view")
+
+
+class ExerciseDefinition(Base):
+    __tablename__ = "exercise_definitions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    step_id: Mapped[str] = mapped_column(
+        ForeignKey("lesson_steps.id", ondelete="CASCADE"), unique=True, index=True
+    )
+    exercise_type: Mapped[str] = mapped_column(String(40))
+    learner_level: Mapped[str] = mapped_column(String(10), default="A1")
+    skill_category: Mapped[str] = mapped_column(String(40))
+    prompt_en: Mapped[str] = mapped_column(Text)
+    support_ml: Mapped[str | None] = mapped_column(Text, nullable=True)
+    options: Mapped[list[Any] | None] = mapped_column(JSON, nullable=True)
+    correct_answer: Mapped[Any] = mapped_column(JSON)
+    explanation_en: Mapped[str] = mapped_column(Text)
+    explanation_ml: Mapped[str | None] = mapped_column(Text, nullable=True)
+    scoring_weight: Mapped[int] = mapped_column(Integer, default=1)
+    max_attempts: Mapped[int] = mapped_column(Integer, default=3)
+    retry_policy: Mapped[str] = mapped_column(String(30), default="until_correct")
+    content_version: Mapped[int] = mapped_column(Integer, default=1)
+    scoring_config: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
+class CourseEnrollment(Base):
+    __tablename__ = "course_enrollments"
+    __table_args__ = (UniqueConstraint("user_id", "course_id"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    course_id: Mapped[str] = mapped_column(ForeignKey("courses.id", ondelete="CASCADE"), index=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    current_lesson_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    last_activity_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class LessonProgress(Base):
+    __tablename__ = "lesson_progress"
+    __table_args__ = (UniqueConstraint("user_id", "lesson_id"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    lesson_id: Mapped[str] = mapped_column(ForeignKey("lessons.id", ondelete="CASCADE"), index=True)
+    current_step_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_activity_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    score: Mapped[float] = mapped_column(default=0)
+    total_attempts: Mapped[int] = mapped_column(Integer, default=0)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    sync_state: Mapped[str] = mapped_column(String(20), default="synced")
+
+
+class LessonStepProgress(Base):
+    __tablename__ = "lesson_step_progress"
+    __table_args__ = (UniqueConstraint("user_id", "step_id"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    step_id: Mapped[str] = mapped_column(
+        ForeignKey("lesson_steps.id", ondelete="CASCADE"), index=True
+    )
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ExerciseAttempt(Base):
+    __tablename__ = "exercise_attempts"
+    __table_args__ = (UniqueConstraint("client_operation_id"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    exercise_id: Mapped[str] = mapped_column(ForeignKey("exercise_definitions.id"), index=True)
+    content_version: Mapped[int] = mapped_column(Integer)
+    answer_snapshot: Mapped[Any] = mapped_column(JSON)
+    is_correct: Mapped[bool] = mapped_column(Boolean)
+    score: Mapped[float] = mapped_column()
+    attempt_number: Mapped[int] = mapped_column(Integer)
+    client_operation_id: Mapped[str] = mapped_column(String(80), index=True)
+    submitted_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class OfflineSyncOperation(Base):
+    __tablename__ = "offline_sync_operations"
+    __table_args__ = (UniqueConstraint("user_id", "client_operation_id"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    client_operation_id: Mapped[str] = mapped_column(String(80))
+    operation_type: Mapped[str] = mapped_column(String(40))
+    entity_id: Mapped[str] = mapped_column(String(36))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    retry_count: Mapped[int] = mapped_column(Integer, default=0)
+    last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    sync_status: Mapped[str] = mapped_column(String(20), default="pending")

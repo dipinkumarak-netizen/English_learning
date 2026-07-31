@@ -19,9 +19,11 @@ class AuthState {
   final String? error;
 }
 
-final apiClientProvider = Provider<ApiClient>((ref) => ApiClient());
 final tokenStorageProvider = Provider<TokenStorage>(
   (ref) => SecureTokenStorage(),
+);
+final apiClientProvider = Provider<ApiClient>(
+  (ref) => ApiClient(tokens: ref.watch(tokenStorageProvider)),
 );
 final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepository(

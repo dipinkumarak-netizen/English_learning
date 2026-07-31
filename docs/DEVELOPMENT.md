@@ -31,6 +31,8 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
+Seed the original Phase 3 curriculum with `python -m app.seed`. The command is idempotent and preserves learner progress. The published course APIs require authentication.
+
 ## Docker
 
 Copy `.env.example` to `.env`, then run `docker compose config` and `docker compose up --build` from the repository root. PostgreSQL is reachable only inside the Compose network. Docker was unavailable during this implementation, so these commands were not executed here.
@@ -38,3 +40,5 @@ Copy `.env.example` to `.env`, then run `docker compose config` and `docker comp
 ## Private-use settings
 
 Set `ALLOW_REGISTRATION=false` after creating the personal account. Use HTTPS and a strong `JWT_SECRET` for any remote deployment. Password recovery email, social login, and phone OTP are intentionally not implemented.
+
+The mobile Phase 3 cache uses Drift/SQLite. Run `dart run build_runner build` after changing Drift table definitions. Access and refresh tokens remain in secure storage; Drift stores only course content, local progress, and pending sync operations.

@@ -4,9 +4,9 @@ NilaSpeak is an original Malayalam-first spoken-English learning application for
 
 ## Current scope
 
-Phase 1 foundation and Phase 2 are implemented: Flutter Android/Web setup with an English-only interface, Malayalam learning-support content, Material 3, Riverpod, GoRouter, FastAPI, PostgreSQL/Alembic foundation, local email/password authentication, secure token lifecycle, learner profile, resumable onboarding, text placement assessment, and deterministic learning-plan generation.
+Phase 1, Phase 2, and Phase 3 are implemented: an English-only Flutter interface with Malayalam learning support, secure authentication with automatic refresh, original data-driven beginner courses, deterministic exercises, lesson progress, Drift offline caching, and an idempotent progress-sync API.
 
-AI, voice, pronunciation, complete courses, vocabulary, payments, subscriptions, commercial analytics, admin, and social features are intentionally out of scope.
+AI, live content generation, voice, speech-to-text, text-to-speech, pronunciation scoring, adaptive recommendations, payments, subscriptions, commercial analytics, admin, and social features are intentionally out of scope.
 
 ## Repository structure
 
