@@ -1,10 +1,14 @@
 import asyncio
 
+import httpx
 from conftest import get_settings
 
+from app.core.config import Settings
 from app.voice.providers import (
     MockSpeechToTextProvider,
     MockTextToSpeechProvider,
+    OpenAISpeechToTextProvider,
+    OpenAITextToSpeechProvider,
     SpeechToTextRequest,
     TextToSpeechRequest,
 )
@@ -35,6 +39,24 @@ def fake_m4a() -> bytes:
     return b"\x00\x00\x00\x18ftypM4A " + b"\x00" * 32
 
 
+class StubProviderClient:
+    def __init__(self, response: httpx.Response | Exception) -> None:
+        self.response = response
+        self.request: dict = {}
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *_):
+        return False
+
+    async def post(self, url: str, **kwargs):
+        self.request = {"url": url, **kwargs}
+        if isinstance(self.response, Exception):
+            raise self.response
+        return self.response
+
+
 def test_mock_voice_providers_are_deterministic():
     async def run() -> None:
         stt = await MockSpeechToTextProvider().transcribe(
@@ -46,6 +68,86 @@ def test_mock_voice_providers_are_deterministic():
         assert stt.transcript == "I would like to practise English today."
         assert tts.mime_type == "audio/wav"
         assert tts.audio_bytes[:4] == b"RIFF"
+
+    asyncio.run(run())
+
+
+def test_openai_provider_adapters_build_requests_and_parse_responses(monkeypatch):
+    stt_response = httpx.Response(
+        200,
+        json={"text": "Actual spoken text.", "language": "en"},
+        request=httpx.Request("POST", "https://provider.test/v1/audio/transcriptions"),
+    )
+    stt_client = StubProviderClient(stt_response)
+    monkeypatch.setattr("app.voice.providers.httpx.AsyncClient", lambda **_: stt_client)
+    settings = Settings(
+        stt_enabled=True,
+        stt_provider="openai",
+        stt_model="transcribe-test",
+        stt_api_key="test-key",
+        stt_base_url="https://provider.test/v1",
+    )
+
+    async def run() -> None:
+        result = await OpenAISpeechToTextProvider(settings).transcribe(
+            SpeechToTextRequest(b"audio", "audio/mp4", "en")
+        )
+        assert result.transcript == "Actual spoken text."
+        assert stt_client.request["url"].endswith("/audio/transcriptions")
+        assert stt_client.request["data"]["model"] == "transcribe-test"
+        assert stt_client.request["files"]["file"][2] == "audio/mp4"
+
+    asyncio.run(run())
+
+    tts_response = httpx.Response(
+        200,
+        content=b"ID3real-audio",
+        headers={"content-type": "audio/mpeg"},
+        request=httpx.Request("POST", "https://provider.test/v1/audio/speech"),
+    )
+    tts_client = StubProviderClient(tts_response)
+    monkeypatch.setattr("app.voice.providers.httpx.AsyncClient", lambda **_: tts_client)
+    tts_settings = settings.model_copy(
+        update={
+            "tts_enabled": True,
+            "tts_provider": "openai",
+            "tts_model": "synthesis-test",
+            "tts_api_key": "test-key",
+            "tts_base_url": "https://provider.test/v1",
+            "tts_voice": "alloy",
+        }
+    )
+
+    async def synthesize() -> None:
+        result = await OpenAITextToSpeechProvider(tts_settings).synthesise(
+            TextToSpeechRequest("Actual tutor reply.", "alloy", 1.0)
+        )
+        assert result.audio_bytes.startswith(b"ID3")
+        assert result.mime_type == "audio/mpeg"
+        assert tts_client.request["json"]["response_format"] == "mp3"
+
+    asyncio.run(synthesize())
+
+
+def test_openai_provider_timeout_is_sanitised(monkeypatch):
+    client = StubProviderClient(httpx.ReadTimeout("provider timed out"))
+    monkeypatch.setattr("app.voice.providers.httpx.AsyncClient", lambda **_: client)
+    settings = Settings(
+        stt_enabled=True,
+        stt_provider="openai",
+        stt_model="transcribe-test",
+        stt_api_key="test-key",
+    )
+
+    async def run() -> None:
+        try:
+            await OpenAISpeechToTextProvider(settings).transcribe(
+                SpeechToTextRequest(b"audio", "audio/mp4", "en")
+            )
+        except Exception as error:
+            assert str(error) == "Speech transcription timed out."
+        else:
+            raise AssertionError("Expected provider timeout")
 
     asyncio.run(run())
 

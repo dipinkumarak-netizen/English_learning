@@ -48,5 +48,6 @@ Thumbs.db
 
 # Generated outputs
 *.log
+backend/runtime/
 dist/
 tmp/

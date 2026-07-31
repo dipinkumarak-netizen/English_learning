@@ -5,6 +5,8 @@ import wave
 from dataclasses import dataclass
 from typing import Protocol
 
+import httpx
+
 from app.core.config import Settings
 
 
@@ -17,6 +19,10 @@ class VoiceProviderUnavailable(VoiceProviderError):
 
 
 class VoiceProviderTimeout(VoiceProviderError):
+    pass
+
+
+class VoiceProviderRateLimited(VoiceProviderError):
     pass
 
 
@@ -150,11 +156,157 @@ class MockTextToSpeechProvider:
         )
 
 
+def _api_key(settings: Settings, specific: str) -> str:
+    return specific or settings.ai_api_key
+
+
+def _base_url(configured: str) -> str:
+    return (configured or "https://api.openai.com/v1").rstrip("/")
+
+
+def _provider_error(response: httpx.Response, operation: str) -> VoiceProviderError:
+    if response.status_code == 429:
+        return VoiceProviderRateLimited(f"{operation} provider rate limit reached.")
+    if response.status_code >= 500:
+        return VoiceProviderUnavailable(f"{operation} provider is temporarily unavailable.")
+    return VoiceProviderMalformed(f"{operation} provider rejected the request.")
+
+
+class OpenAISpeechToTextProvider:
+    name = "openai"
+
+    def __init__(self, settings: Settings) -> None:
+        self.model = settings.stt_model
+        self._api_key = _api_key(settings, settings.stt_api_key)
+        self._url = f"{_base_url(settings.stt_base_url)}/audio/transcriptions"
+        self._timeout = settings.stt_request_timeout_seconds
+
+    async def transcribe(self, request: SpeechToTextRequest) -> SpeechToTextResult:
+        if not self._api_key:
+            raise VoiceProviderUnavailable("Speech transcription is not configured.")
+        if not request.audio_bytes:
+            raise VoiceProviderMalformed("The uploaded audio is empty.")
+        filename = "recording.m4a" if request.mime_type != "audio/aac" else "recording.aac"
+        try:
+            async with httpx.AsyncClient(timeout=self._timeout) as client:
+                response = await client.post(
+                    self._url,
+                    headers={"Authorization": f"Bearer {self._api_key}"},
+                    files={"file": (filename, request.audio_bytes, request.mime_type)},
+                    # Leave language unset so the provider can detect mixed speech.
+                    data={"model": self.model},
+                )
+        except httpx.TimeoutException as error:
+            raise VoiceProviderTimeout("Speech transcription timed out.") from error
+        except httpx.HTTPError as error:
+            raise VoiceProviderUnavailable(
+                "Speech transcription is temporarily unavailable."
+            ) from error
+        if response.status_code != 200:
+            raise _provider_error(response, "Speech transcription")
+        try:
+            payload = response.json()
+            transcript = payload.get("text")
+            if not isinstance(transcript, str) or not transcript.strip():
+                raise ValueError("missing text")
+            usage = payload.get("usage") or {}
+            audio_seconds = usage.get("seconds") or usage.get("duration") or 0
+            return SpeechToTextResult(
+                transcript=transcript.strip(),
+                detected_language=payload.get("language")
+                if isinstance(payload.get("language"), str)
+                else None,
+                duration_seconds=int(audio_seconds or 0),
+                provider=self.name,
+                model=self.model,
+                warnings=[],
+                provider_usage={"audio_seconds": int(audio_seconds or 0)},
+            )
+        except (ValueError, TypeError, AttributeError) as error:
+            raise VoiceProviderMalformed(
+                "Speech transcription returned an invalid response."
+            ) from error
+
+
+class OpenAITextToSpeechProvider:
+    name = "openai"
+    allowed_voices = {
+        "alloy",
+        "ash",
+        "coral",
+        "echo",
+        "fable",
+        "nova",
+        "onyx",
+        "sage",
+        "shimmer",
+        "marin",
+        "cedar",
+    }
+
+    def __init__(self, settings: Settings) -> None:
+        self.model = settings.tts_model
+        self._api_key = _api_key(settings, settings.tts_api_key)
+        self._url = f"{_base_url(settings.tts_base_url)}/audio/speech"
+        self._timeout = settings.tts_request_timeout_seconds
+
+    async def synthesise(self, request: TextToSpeechRequest) -> TextToSpeechResult:
+        if not self._api_key:
+            raise VoiceProviderUnavailable("Tutor audio is not configured.")
+        if not request.text.strip():
+            raise VoiceProviderMalformed("Tutor audio text is empty.")
+        if request.voice not in self.allowed_voices:
+            raise VoiceProviderMalformed("The configured tutor voice is not allowed.")
+        try:
+            async with httpx.AsyncClient(timeout=self._timeout) as client:
+                response = await client.post(
+                    self._url,
+                    headers={"Authorization": f"Bearer {self._api_key}"},
+                    json={
+                        "model": self.model,
+                        "input": request.text,
+                        "voice": request.voice,
+                        "response_format": "mp3",
+                        "speed": request.speed,
+                    },
+                )
+        except httpx.TimeoutException as error:
+            raise VoiceProviderTimeout("Tutor audio timed out.") from error
+        except httpx.HTTPError as error:
+            raise VoiceProviderUnavailable("Tutor audio is temporarily unavailable.") from error
+        if response.status_code != 200:
+            raise _provider_error(response, "Tutor audio")
+        if not response.content or not response.headers.get("content-type", "").startswith(
+            "audio/"
+        ):
+            raise VoiceProviderMalformed("Tutor audio returned an invalid audio response.")
+        mime_type = response.headers.get("content-type", "audio/mpeg").split(";", 1)[0]
+        if mime_type not in {
+            "audio/mpeg",
+            "audio/mp3",
+            "audio/wav",
+            "audio/wave",
+            "audio/ogg",
+            "audio/opus",
+        }:
+            raise VoiceProviderMalformed("Tutor audio returned an unsupported audio format.")
+        return TextToSpeechResult(
+            audio_bytes=response.content,
+            mime_type=mime_type,
+            duration_seconds=0,
+            voice=request.voice,
+            provider=self.name,
+            model=self.model,
+        )
+
+
 def build_stt_provider(settings: Settings) -> SpeechToTextProvider:
     if not settings.stt_enabled or settings.stt_provider in {"", "none"}:
         return DisabledSpeechToTextProvider()
     if settings.stt_provider == "mock":
         return MockSpeechToTextProvider()
+    if settings.stt_provider == "openai":
+        return OpenAISpeechToTextProvider(settings)
     raise VoiceProviderUnavailable("The configured speech provider is unsupported.")
 
 
@@ -163,4 +315,6 @@ def build_tts_provider(settings: Settings) -> TextToSpeechProvider:
         return DisabledTextToSpeechProvider()
     if settings.tts_provider == "mock":
         return MockTextToSpeechProvider()
+    if settings.tts_provider == "openai":
+        return OpenAITextToSpeechProvider(settings)
     raise VoiceProviderUnavailable("The configured speech provider is unsupported.")
