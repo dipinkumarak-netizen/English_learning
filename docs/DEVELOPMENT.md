@@ -12,6 +12,10 @@ The Android emulator reaches a host backend through `http://10.0.2.2:8000`. Web 
 
 The application interface is English-only. There is no UI-language switcher. Malayalam remains available as a learner native language and explanation language for educational content.
 
+## Source-control workflow
+
+GitHub is the authoritative backup for validated source code. Every completed phase must be fully validated, committed with a focused message, and pushed to the configured GitHub repository. Never commit secrets or runtime data; `.env` files, credentials, tokens, local databases, uploaded media, build outputs, APKs, and virtual environments remain outside Git. Persistent database and uploaded-media backups are separate operational backups and are not provided by Git source control.
+
 ## Backend
 
 ```powershell
