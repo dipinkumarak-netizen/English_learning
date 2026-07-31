@@ -21,6 +21,7 @@ import '../../features/courses/presentation/progress_summary_screen.dart';
 import '../../features/tutor/presentation/mistake_notebook_screen.dart';
 import '../../features/tutor/presentation/tutor_chat_screen.dart';
 import '../../features/tutor/presentation/tutor_home_screen.dart';
+import '../../features/voice/presentation/voice_conversation_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/settings/presentation/migration_screen.dart';
 import 'route_names.dart';
@@ -137,6 +138,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/tutor/chat/:conversationId',
         builder: (_, state) => TutorChatScreen(
           conversationId: state.pathParameters['conversationId']!,
+        ),
+      ),
+      GoRoute(
+        path: '/tutor/voice/:sessionId',
+        builder: (_, state) => VoiceConversationScreen(
+          sessionId: state.pathParameters['sessionId']!,
         ),
       ),
       GoRoute(

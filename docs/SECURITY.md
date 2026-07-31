@@ -1,5 +1,7 @@
 # Security foundation
 
+Voice uses explicit first-recording consent, authenticated ownership checks, MIME/extension/magic-byte/size/duration validation, random storage keys, short retention, cleanup, and cascade deletion. Raw learner audio is temporary and is not retained by default.
+
 - Never commit `.env`, passwords, tokens, provider keys, or signing keys.
 - Passwords are Argon2-hashed and never returned or logged.
 - Access tokens are short-lived JWTs. Refresh tokens are opaque, stored only as SHA-256 hashes, rotated on refresh, expired, and revoked on logout.

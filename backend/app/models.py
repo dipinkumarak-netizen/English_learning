@@ -529,6 +529,124 @@ class AIUsageRecord(Base):
     failure_category: Mapped[str | None] = mapped_column(String(40), nullable=True)
 
 
+class VoiceConversationSession(TimestampMixin, Base):
+    __tablename__ = "voice_conversation_sessions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    conversation_id: Mapped[str] = mapped_column(
+        ForeignKey("tutor_conversations.id", ondelete="CASCADE"), index=True
+    )
+    tutor_mode: Mapped[str] = mapped_column(String(40))
+    status: Mapped[str] = mapped_column(String(20), default="active", index=True)
+    language: Mapped[str] = mapped_column(String(10), default="en")
+    explanation_language: Mapped[str] = mapped_column(String(10), default="en")
+    recording_mode: Mapped[str] = mapped_column(String(20), default="tap")
+    auto_play: Mapped[bool] = mapped_column(Boolean, default=False)
+    playback_speed: Mapped[float] = mapped_column(default=1.0)
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    total_learner_audio_seconds: Mapped[int] = mapped_column(Integer, default=0)
+    total_tutor_audio_seconds: Mapped[int] = mapped_column(Integer, default=0)
+    total_voice_turns: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class VoiceTurn(Base):
+    __tablename__ = "voice_turns"
+    __table_args__ = (
+        UniqueConstraint("session_id", "client_operation_id"),
+        UniqueConstraint("session_id", "turn_number"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    session_id: Mapped[str] = mapped_column(
+        ForeignKey("voice_conversation_sessions.id", ondelete="CASCADE"), index=True
+    )
+    conversation_id: Mapped[str] = mapped_column(
+        ForeignKey("tutor_conversations.id", ondelete="CASCADE"), index=True
+    )
+    turn_number: Mapped[int] = mapped_column(Integer)
+    client_operation_id: Mapped[str] = mapped_column(String(80))
+    learner_audio_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    recording_duration_seconds: Mapped[int] = mapped_column(Integer, default=0)
+    transcription_status: Mapped[str] = mapped_column(String(24), default="pending")
+    transcript: Mapped[str | None] = mapped_column(Text, nullable=True)
+    edited_transcript: Mapped[str | None] = mapped_column(Text, nullable=True)
+    detected_language: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    stt_provider: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    stt_model: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    stt_operation_id: Mapped[str | None] = mapped_column(String(80), nullable=True, unique=True)
+    tutor_message_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
+    tutor_audio_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    synthesis_status: Mapped[str] = mapped_column(String(24), default="not_requested")
+    synthesis_operation_id: Mapped[str | None] = mapped_column(
+        String(80), nullable=True, unique=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    failure_category: Mapped[str | None] = mapped_column(String(40), nullable=True)
+
+
+class AudioAsset(Base):
+    __tablename__ = "voice_audio_assets"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    session_id: Mapped[str] = mapped_column(
+        ForeignKey("voice_conversation_sessions.id", ondelete="CASCADE"), index=True
+    )
+    turn_id: Mapped[str] = mapped_column(
+        ForeignKey("voice_turns.id", ondelete="CASCADE"), index=True
+    )
+    asset_type: Mapped[str] = mapped_column(String(20))
+    storage_key: Mapped[str] = mapped_column(String(240), unique=True)
+    mime_type: Mapped[str] = mapped_column(String(80))
+    byte_size: Mapped[int] = mapped_column(Integer)
+    duration_seconds: Mapped[int] = mapped_column(Integer, default=0)
+    provider: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    model: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    status: Mapped[str] = mapped_column(String(24), default="temporary")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+
+
+class VoicePreference(Base):
+    __tablename__ = "voice_preferences"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
+    voice: Mapped[str] = mapped_column(String(40), default="default")
+    auto_play: Mapped[bool] = mapped_column(Boolean, default=False)
+    playback_speed: Mapped[float] = mapped_column(default=1.0)
+    transcript_visible: Mapped[bool] = mapped_column(Boolean, default=True)
+    recording_mode: Mapped[str] = mapped_column(String(20), default="tap")
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class VoiceUsageRecord(Base):
+    __tablename__ = "voice_usage_records"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    session_id: Mapped[str | None] = mapped_column(
+        ForeignKey("voice_conversation_sessions.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    turn_id: Mapped[str | None] = mapped_column(
+        ForeignKey("voice_turns.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    provider: Mapped[str] = mapped_column(String(40))
+    model: Mapped[str] = mapped_column(String(100))
+    operation: Mapped[str] = mapped_column(String(30))
+    audio_duration_seconds: Mapped[int] = mapped_column(Integer, default=0)
+    synthesis_characters: Mapped[int] = mapped_column(Integer, default=0)
+    request_status: Mapped[str] = mapped_column(String(30))
+    latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    provider_usage: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    failure_category: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class PromptTemplateVersion(Base):
     __tablename__ = "prompt_template_versions"
     __table_args__ = (UniqueConstraint("task", "version"),)

@@ -6,6 +6,7 @@ import '../../../core/widgets/app_error_view.dart';
 import '../../../core/widgets/app_loading_indicator.dart';
 import 'tutor_providers.dart';
 import '../../authentication/presentation/auth_controller.dart';
+import '../../voice/presentation/voice_providers.dart';
 
 class TutorHomeScreen extends ConsumerStatefulWidget {
   const TutorHomeScreen({super.key});
@@ -134,6 +135,12 @@ class _TutorHomeScreenState extends ConsumerState<TutorHomeScreen> {
                     icon: const Icon(Icons.chat_bubble_outline),
                     label: Text(_creating ? 'Starting…' : 'Start practice'),
                   ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: _creating ? null : _createVoiceConversation,
+                    icon: const Icon(Icons.mic_none),
+                    label: const Text('Start voice conversation'),
+                  ),
                 ],
               ),
             ),
@@ -190,6 +197,31 @@ class _TutorHomeScreenState extends ConsumerState<TutorHomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('The tutor is not configured or unavailable.'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _creating = false);
+    }
+  }
+
+  Future<void> _createVoiceConversation() async {
+    setState(() => _creating = true);
+    try {
+      final conversation = await ref
+          .read(tutorRepositoryProvider)
+          .createConversation(_mode, 'important');
+      final session = await ref
+          .read(voiceRepositoryProvider)
+          .createSession(conversation['id'] as String);
+      if (mounted) context.push('/tutor/voice/${session['id']}');
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Voice conversation needs a connected account and backend.',
+            ),
           ),
         );
       }

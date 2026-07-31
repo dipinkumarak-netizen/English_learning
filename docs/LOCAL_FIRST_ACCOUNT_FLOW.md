@@ -27,3 +27,4 @@ Logout revokes the refresh session, clears secure tokens, disconnects the accoun
 ## Known limitations
 
 The first local curriculum is a bundled starter fallback; full published curriculum delivery remains server-backed. Real external AI provider integration and voice work are future phases.
+Voice is an authenticated capability. Local-first startup, course learning, and text tutor fallback remain available without an account; local users cannot upload audio or create voice sessions. Voice transcript/session metadata may be cached after an authenticated session, while raw audio stays temporary and app-private.

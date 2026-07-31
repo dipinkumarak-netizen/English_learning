@@ -1,5 +1,7 @@
 # NilaSpeak roadmap
 
+Phase 5 is implemented within the validated local/mock-provider scope: authenticated turn-based Android voice, mock STT/TTS boundaries, transcript confirmation, temporary audio storage, usage safety limits, and Drift metadata cache. Phase 6 pronunciation analysis remains out of scope.
+
 - Phase 0 — Audit and specification: **complete**.
 - Phase 1 — Foundation: **complete**.
 - Phase 2 — Authentication and onboarding: **complete within validated local scope**.

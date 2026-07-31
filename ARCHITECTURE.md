@@ -26,3 +26,6 @@ Flutter formatting, analysis, widget tests, and Android builds run in CI. Backen
 
 NilaSpeak is private personal-use software. Subscription, billing, entitlement, trial, purchase, Play Store publishing, and commercial analytics layers are removed from active scope.
 The mobile application uses separate local learner and backend account state. Drift owns structured local profile, course cache, lesson progress, pending sync, and tutor cache; secure storage owns only authentication tokens. GoRouter permits local onboarding and home without authentication. Settings connects an account and invokes authenticated migration/sync capabilities.
+## Turn-based voice boundary
+
+The mobile voice feature is a thin turn-based client: recorder and permission services create a private M4A file, the user reviews STT output, and the final text is submitted to the existing tutor conversation. Backend voice sessions and turns own temporary audio assets and expose provider-neutral STT/TTS interfaces. Provider credentials stay server-side; disabled providers do not affect non-voice startup or text tutor routes.

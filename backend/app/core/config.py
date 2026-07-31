@@ -24,6 +24,27 @@ class Settings(BaseSettings):
     ai_max_message_characters: int = 2000
     ai_conversation_context_limit: int = 12
     ai_provider_enabled: bool = False
+    stt_provider: str = "none"
+    stt_model: str = "mock-stt-v1"
+    stt_api_key: str = ""
+    stt_base_url: str = ""
+    stt_request_timeout_seconds: int = 20
+    stt_max_audio_seconds: int = 60
+    stt_max_upload_bytes: int = 5_000_000
+    stt_enabled: bool = False
+    tts_provider: str = "none"
+    tts_model: str = "mock-tts-v1"
+    tts_voice: str = "default"
+    tts_api_key: str = ""
+    tts_base_url: str = ""
+    tts_request_timeout_seconds: int = 20
+    tts_max_text_characters: int = 500
+    tts_enabled: bool = False
+    voice_daily_transcription_seconds: int = 600
+    voice_daily_synthesis_characters: int = 10_000
+    voice_max_turns_per_session: int = 20
+    voice_temp_audio_retention_minutes: int = 30
+    voice_audio_storage_path: str = "./runtime/audio"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
 

@@ -1,5 +1,7 @@
 # Development guide
 
+For Phase 5 mock voice development, use `STT_ENABLED=true STT_PROVIDER=mock TTS_ENABLED=true TTS_PROVIDER=mock`. Voice requires a real signed-in account; local mode intentionally keeps text tutor fallback. Android uses maintained `record`, `just_audio`, and `permission_handler` packages. Web keeps text tutor as the reliable fallback.
+
 ## Flutter
 
 ```powershell

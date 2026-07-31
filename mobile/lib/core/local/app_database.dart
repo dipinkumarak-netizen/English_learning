@@ -129,6 +129,35 @@ class TutorDrafts extends Table {
   Set<Column<Object>> get primaryKey => {conversationId};
 }
 
+class CachedVoiceSessions extends Table {
+  TextColumn get id => text()();
+  TextColumn get payload => text()();
+  DateTimeColumn get cachedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+class CachedVoiceTurns extends Table {
+  TextColumn get id => text()();
+  TextColumn get sessionId => text()();
+  TextColumn get payload => text()();
+  TextColumn get tutorAudioId => text().nullable()();
+  DateTimeColumn get cachedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+class VoicePreferences extends Table {
+  TextColumn get id => text()();
+  TextColumn get payload => text()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 class LocalLearnerProfiles extends Table {
   TextColumn get id => text()();
   TextColumn get displayName => text().withDefault(const Constant('Learner'))();
@@ -164,6 +193,9 @@ class LocalLearnerProfiles extends Table {
     CachedTutorMistakes,
     CachedTutorSummaries,
     TutorDrafts,
+    CachedVoiceSessions,
+    CachedVoiceTurns,
+    VoicePreferences,
     LocalLearnerProfiles,
   ],
 )
@@ -171,7 +203,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -185,6 +217,11 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(tutorDrafts);
       }
       if (from < 3) await m.createTable(localLearnerProfiles);
+      if (from < 4) {
+        await m.createTable(cachedVoiceSessions);
+        await m.createTable(cachedVoiceTurns);
+        await m.createTable(voicePreferences);
+      }
     },
   );
 

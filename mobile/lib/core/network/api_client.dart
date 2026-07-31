@@ -59,6 +59,48 @@ final class ApiClient {
     accessToken,
   );
 
+  Future<Map<String, dynamic>> patch(
+    String path, {
+    Map<String, dynamic>? data,
+    String? accessToken,
+  }) => _request(
+    (token) => _dio.patch<Map<String, dynamic>>(
+      path,
+      data: data,
+      options: _options(token),
+    ),
+    accessToken,
+  );
+
+  Future<Map<String, dynamic>> postMultipart(
+    String path, {
+    required FormData data,
+    String? accessToken,
+  }) => _request(
+    (token) => _dio.post<Map<String, dynamic>>(
+      path,
+      data: data,
+      options: _options(token),
+    ),
+    accessToken,
+  );
+
+  Future<List<int>> downloadBytes(String path, {String? accessToken}) async {
+    try {
+      final response = await _dio.get<List<int>>(
+        path,
+        options: _options(
+          accessToken,
+        ).copyWith(responseType: ResponseType.bytes),
+      );
+      return response.data ?? const <int>[];
+    } catch (error, stackTrace) {
+      final mapped = mapDioError(error);
+      AppLogger.instance.error('API download failed', mapped, stackTrace);
+      throw mapped;
+    }
+  }
+
   Future<void> delete(String path, {String? accessToken}) async {
     try {
       await _dio.delete<void>(path, options: _options(accessToken));

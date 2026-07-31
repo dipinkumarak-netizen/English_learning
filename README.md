@@ -1,5 +1,9 @@
 # NilaSpeak
 
+## Phase 5 voice boundary
+
+Phase 5 adds authenticated turn-based voice conversation with transcript review and optional temporary tutor audio. Pronunciation scoring, phoneme analysis, accent scoring, fluency certification, real-time streaming voice, payments, and social voice remain out of scope.
+
 NilaSpeak is an original Malayalam-first spoken-English learning application for private, personal use. It will not be commercially released or published on Google Play.
 
 ## Current scope

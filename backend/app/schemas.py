@@ -464,3 +464,45 @@ class TutorModeResponse(BaseModel):
     id: str
     title: str
     description: str
+
+
+class VoiceSessionCreate(BaseModel):
+    conversation_id: str
+    recording_mode: Literal["tap"] = "tap"
+    auto_play: bool = False
+    playback_speed: float = 1.0
+
+    @field_validator("playback_speed")
+    @classmethod
+    def supported_speed(cls, value: float) -> float:
+        if value not in {0.75, 1.0, 1.25}:
+            raise ValueError("Playback speed must be 0.75, 1.0, or 1.25.")
+        return value
+
+
+class VoiceTranscriptUpdate(BaseModel):
+    transcript: str = Field(min_length=1, max_length=2000)
+
+
+class VoiceSubmitRequest(BaseModel):
+    client_operation_id: str = Field(min_length=8, max_length=80)
+
+
+class VoiceSynthesisRequest(BaseModel):
+    client_operation_id: str = Field(min_length=8, max_length=80)
+    text_kind: Literal["reply", "correction", "alternative"] = "reply"
+
+
+class VoicePreferenceUpdate(BaseModel):
+    voice: str = Field(default="default", min_length=1, max_length=40)
+    auto_play: bool = False
+    playback_speed: float = 1.0
+    transcript_visible: bool = True
+    recording_mode: Literal["tap"] = "tap"
+
+    @field_validator("playback_speed")
+    @classmethod
+    def supported_speed(cls, value: float) -> float:
+        if value not in {0.75, 1.0, 1.25}:
+            raise ValueError("Playback speed must be 0.75, 1.0, or 1.25.")
+        return value

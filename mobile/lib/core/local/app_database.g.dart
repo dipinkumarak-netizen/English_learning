@@ -3950,6 +3950,904 @@ class TutorDraftsCompanion extends UpdateCompanion<TutorDraft> {
   }
 }
 
+class $CachedVoiceSessionsTable extends CachedVoiceSessions
+    with TableInfo<$CachedVoiceSessionsTable, CachedVoiceSession> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedVoiceSessionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cachedAtMeta = const VerificationMeta(
+    'cachedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> cachedAt = GeneratedColumn<DateTime>(
+    'cached_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, payload, cachedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_voice_sessions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedVoiceSession> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    if (data.containsKey('cached_at')) {
+      context.handle(
+        _cachedAtMeta,
+        cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cachedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CachedVoiceSession map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedVoiceSession(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      cachedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cached_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedVoiceSessionsTable createAlias(String alias) {
+    return $CachedVoiceSessionsTable(attachedDatabase, alias);
+  }
+}
+
+class CachedVoiceSession extends DataClass
+    implements Insertable<CachedVoiceSession> {
+  final String id;
+  final String payload;
+  final DateTime cachedAt;
+  const CachedVoiceSession({
+    required this.id,
+    required this.payload,
+    required this.cachedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['payload'] = Variable<String>(payload);
+    map['cached_at'] = Variable<DateTime>(cachedAt);
+    return map;
+  }
+
+  CachedVoiceSessionsCompanion toCompanion(bool nullToAbsent) {
+    return CachedVoiceSessionsCompanion(
+      id: Value(id),
+      payload: Value(payload),
+      cachedAt: Value(cachedAt),
+    );
+  }
+
+  factory CachedVoiceSession.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedVoiceSession(
+      id: serializer.fromJson<String>(json['id']),
+      payload: serializer.fromJson<String>(json['payload']),
+      cachedAt: serializer.fromJson<DateTime>(json['cachedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'payload': serializer.toJson<String>(payload),
+      'cachedAt': serializer.toJson<DateTime>(cachedAt),
+    };
+  }
+
+  CachedVoiceSession copyWith({
+    String? id,
+    String? payload,
+    DateTime? cachedAt,
+  }) => CachedVoiceSession(
+    id: id ?? this.id,
+    payload: payload ?? this.payload,
+    cachedAt: cachedAt ?? this.cachedAt,
+  );
+  CachedVoiceSession copyWithCompanion(CachedVoiceSessionsCompanion data) {
+    return CachedVoiceSession(
+      id: data.id.present ? data.id.value : this.id,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      cachedAt: data.cachedAt.present ? data.cachedAt.value : this.cachedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedVoiceSession(')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('cachedAt: $cachedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, payload, cachedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedVoiceSession &&
+          other.id == this.id &&
+          other.payload == this.payload &&
+          other.cachedAt == this.cachedAt);
+}
+
+class CachedVoiceSessionsCompanion extends UpdateCompanion<CachedVoiceSession> {
+  final Value<String> id;
+  final Value<String> payload;
+  final Value<DateTime> cachedAt;
+  final Value<int> rowid;
+  const CachedVoiceSessionsCompanion({
+    this.id = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.cachedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedVoiceSessionsCompanion.insert({
+    required String id,
+    required String payload,
+    required DateTime cachedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       payload = Value(payload),
+       cachedAt = Value(cachedAt);
+  static Insertable<CachedVoiceSession> custom({
+    Expression<String>? id,
+    Expression<String>? payload,
+    Expression<DateTime>? cachedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (payload != null) 'payload': payload,
+      if (cachedAt != null) 'cached_at': cachedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedVoiceSessionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? payload,
+    Value<DateTime>? cachedAt,
+    Value<int>? rowid,
+  }) {
+    return CachedVoiceSessionsCompanion(
+      id: id ?? this.id,
+      payload: payload ?? this.payload,
+      cachedAt: cachedAt ?? this.cachedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (cachedAt.present) {
+      map['cached_at'] = Variable<DateTime>(cachedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedVoiceSessionsCompanion(')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('cachedAt: $cachedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedVoiceTurnsTable extends CachedVoiceTurns
+    with TableInfo<$CachedVoiceTurnsTable, CachedVoiceTurn> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedVoiceTurnsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tutorAudioIdMeta = const VerificationMeta(
+    'tutorAudioId',
+  );
+  @override
+  late final GeneratedColumn<String> tutorAudioId = GeneratedColumn<String>(
+    'tutor_audio_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cachedAtMeta = const VerificationMeta(
+    'cachedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> cachedAt = GeneratedColumn<DateTime>(
+    'cached_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    sessionId,
+    payload,
+    tutorAudioId,
+    cachedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_voice_turns';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedVoiceTurn> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    if (data.containsKey('tutor_audio_id')) {
+      context.handle(
+        _tutorAudioIdMeta,
+        tutorAudioId.isAcceptableOrUnknown(
+          data['tutor_audio_id']!,
+          _tutorAudioIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cached_at')) {
+      context.handle(
+        _cachedAtMeta,
+        cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cachedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CachedVoiceTurn map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedVoiceTurn(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      tutorAudioId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tutor_audio_id'],
+      ),
+      cachedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cached_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedVoiceTurnsTable createAlias(String alias) {
+    return $CachedVoiceTurnsTable(attachedDatabase, alias);
+  }
+}
+
+class CachedVoiceTurn extends DataClass implements Insertable<CachedVoiceTurn> {
+  final String id;
+  final String sessionId;
+  final String payload;
+  final String? tutorAudioId;
+  final DateTime cachedAt;
+  const CachedVoiceTurn({
+    required this.id,
+    required this.sessionId,
+    required this.payload,
+    this.tutorAudioId,
+    required this.cachedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['session_id'] = Variable<String>(sessionId);
+    map['payload'] = Variable<String>(payload);
+    if (!nullToAbsent || tutorAudioId != null) {
+      map['tutor_audio_id'] = Variable<String>(tutorAudioId);
+    }
+    map['cached_at'] = Variable<DateTime>(cachedAt);
+    return map;
+  }
+
+  CachedVoiceTurnsCompanion toCompanion(bool nullToAbsent) {
+    return CachedVoiceTurnsCompanion(
+      id: Value(id),
+      sessionId: Value(sessionId),
+      payload: Value(payload),
+      tutorAudioId: tutorAudioId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(tutorAudioId),
+      cachedAt: Value(cachedAt),
+    );
+  }
+
+  factory CachedVoiceTurn.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedVoiceTurn(
+      id: serializer.fromJson<String>(json['id']),
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      payload: serializer.fromJson<String>(json['payload']),
+      tutorAudioId: serializer.fromJson<String?>(json['tutorAudioId']),
+      cachedAt: serializer.fromJson<DateTime>(json['cachedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'sessionId': serializer.toJson<String>(sessionId),
+      'payload': serializer.toJson<String>(payload),
+      'tutorAudioId': serializer.toJson<String?>(tutorAudioId),
+      'cachedAt': serializer.toJson<DateTime>(cachedAt),
+    };
+  }
+
+  CachedVoiceTurn copyWith({
+    String? id,
+    String? sessionId,
+    String? payload,
+    Value<String?> tutorAudioId = const Value.absent(),
+    DateTime? cachedAt,
+  }) => CachedVoiceTurn(
+    id: id ?? this.id,
+    sessionId: sessionId ?? this.sessionId,
+    payload: payload ?? this.payload,
+    tutorAudioId: tutorAudioId.present ? tutorAudioId.value : this.tutorAudioId,
+    cachedAt: cachedAt ?? this.cachedAt,
+  );
+  CachedVoiceTurn copyWithCompanion(CachedVoiceTurnsCompanion data) {
+    return CachedVoiceTurn(
+      id: data.id.present ? data.id.value : this.id,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      tutorAudioId: data.tutorAudioId.present
+          ? data.tutorAudioId.value
+          : this.tutorAudioId,
+      cachedAt: data.cachedAt.present ? data.cachedAt.value : this.cachedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedVoiceTurn(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('payload: $payload, ')
+          ..write('tutorAudioId: $tutorAudioId, ')
+          ..write('cachedAt: $cachedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, sessionId, payload, tutorAudioId, cachedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedVoiceTurn &&
+          other.id == this.id &&
+          other.sessionId == this.sessionId &&
+          other.payload == this.payload &&
+          other.tutorAudioId == this.tutorAudioId &&
+          other.cachedAt == this.cachedAt);
+}
+
+class CachedVoiceTurnsCompanion extends UpdateCompanion<CachedVoiceTurn> {
+  final Value<String> id;
+  final Value<String> sessionId;
+  final Value<String> payload;
+  final Value<String?> tutorAudioId;
+  final Value<DateTime> cachedAt;
+  final Value<int> rowid;
+  const CachedVoiceTurnsCompanion({
+    this.id = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.tutorAudioId = const Value.absent(),
+    this.cachedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedVoiceTurnsCompanion.insert({
+    required String id,
+    required String sessionId,
+    required String payload,
+    this.tutorAudioId = const Value.absent(),
+    required DateTime cachedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       sessionId = Value(sessionId),
+       payload = Value(payload),
+       cachedAt = Value(cachedAt);
+  static Insertable<CachedVoiceTurn> custom({
+    Expression<String>? id,
+    Expression<String>? sessionId,
+    Expression<String>? payload,
+    Expression<String>? tutorAudioId,
+    Expression<DateTime>? cachedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sessionId != null) 'session_id': sessionId,
+      if (payload != null) 'payload': payload,
+      if (tutorAudioId != null) 'tutor_audio_id': tutorAudioId,
+      if (cachedAt != null) 'cached_at': cachedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedVoiceTurnsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? sessionId,
+    Value<String>? payload,
+    Value<String?>? tutorAudioId,
+    Value<DateTime>? cachedAt,
+    Value<int>? rowid,
+  }) {
+    return CachedVoiceTurnsCompanion(
+      id: id ?? this.id,
+      sessionId: sessionId ?? this.sessionId,
+      payload: payload ?? this.payload,
+      tutorAudioId: tutorAudioId ?? this.tutorAudioId,
+      cachedAt: cachedAt ?? this.cachedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (tutorAudioId.present) {
+      map['tutor_audio_id'] = Variable<String>(tutorAudioId.value);
+    }
+    if (cachedAt.present) {
+      map['cached_at'] = Variable<DateTime>(cachedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedVoiceTurnsCompanion(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('payload: $payload, ')
+          ..write('tutorAudioId: $tutorAudioId, ')
+          ..write('cachedAt: $cachedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $VoicePreferencesTable extends VoicePreferences
+    with TableInfo<$VoicePreferencesTable, VoicePreference> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VoicePreferencesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, payload, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'voice_preferences';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<VoicePreference> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  VoicePreference map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return VoicePreference(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $VoicePreferencesTable createAlias(String alias) {
+    return $VoicePreferencesTable(attachedDatabase, alias);
+  }
+}
+
+class VoicePreference extends DataClass implements Insertable<VoicePreference> {
+  final String id;
+  final String payload;
+  final DateTime updatedAt;
+  const VoicePreference({
+    required this.id,
+    required this.payload,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['payload'] = Variable<String>(payload);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  VoicePreferencesCompanion toCompanion(bool nullToAbsent) {
+    return VoicePreferencesCompanion(
+      id: Value(id),
+      payload: Value(payload),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory VoicePreference.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return VoicePreference(
+      id: serializer.fromJson<String>(json['id']),
+      payload: serializer.fromJson<String>(json['payload']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'payload': serializer.toJson<String>(payload),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  VoicePreference copyWith({
+    String? id,
+    String? payload,
+    DateTime? updatedAt,
+  }) => VoicePreference(
+    id: id ?? this.id,
+    payload: payload ?? this.payload,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  VoicePreference copyWithCompanion(VoicePreferencesCompanion data) {
+    return VoicePreference(
+      id: data.id.present ? data.id.value : this.id,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VoicePreference(')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, payload, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is VoicePreference &&
+          other.id == this.id &&
+          other.payload == this.payload &&
+          other.updatedAt == this.updatedAt);
+}
+
+class VoicePreferencesCompanion extends UpdateCompanion<VoicePreference> {
+  final Value<String> id;
+  final Value<String> payload;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const VoicePreferencesCompanion({
+    this.id = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  VoicePreferencesCompanion.insert({
+    required String id,
+    required String payload,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       payload = Value(payload),
+       updatedAt = Value(updatedAt);
+  static Insertable<VoicePreference> custom({
+    Expression<String>? id,
+    Expression<String>? payload,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (payload != null) 'payload': payload,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  VoicePreferencesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? payload,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return VoicePreferencesCompanion(
+      id: id ?? this.id,
+      payload: payload ?? this.payload,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VoicePreferencesCompanion(')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $LocalLearnerProfilesTable extends LocalLearnerProfiles
     with TableInfo<$LocalLearnerProfilesTable, LocalLearnerProfile> {
   @override
@@ -4786,6 +5684,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CachedTutorSummariesTable cachedTutorSummaries =
       $CachedTutorSummariesTable(this);
   late final $TutorDraftsTable tutorDrafts = $TutorDraftsTable(this);
+  late final $CachedVoiceSessionsTable cachedVoiceSessions =
+      $CachedVoiceSessionsTable(this);
+  late final $CachedVoiceTurnsTable cachedVoiceTurns = $CachedVoiceTurnsTable(
+    this,
+  );
+  late final $VoicePreferencesTable voicePreferences = $VoicePreferencesTable(
+    this,
+  );
   late final $LocalLearnerProfilesTable localLearnerProfiles =
       $LocalLearnerProfilesTable(this);
   @override
@@ -4805,6 +5711,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     cachedTutorMistakes,
     cachedTutorSummaries,
     tutorDrafts,
+    cachedVoiceSessions,
+    cachedVoiceTurns,
+    voicePreferences,
     localLearnerProfiles,
   ];
 }
@@ -7164,6 +8073,560 @@ typedef $$TutorDraftsTableProcessedTableManager =
       TutorDraft,
       PrefetchHooks Function()
     >;
+typedef $$CachedVoiceSessionsTableCreateCompanionBuilder =
+    CachedVoiceSessionsCompanion Function({
+      required String id,
+      required String payload,
+      required DateTime cachedAt,
+      Value<int> rowid,
+    });
+typedef $$CachedVoiceSessionsTableUpdateCompanionBuilder =
+    CachedVoiceSessionsCompanion Function({
+      Value<String> id,
+      Value<String> payload,
+      Value<DateTime> cachedAt,
+      Value<int> rowid,
+    });
+
+class $$CachedVoiceSessionsTableFilterComposer
+    extends Composer<_$AppDatabase, $CachedVoiceSessionsTable> {
+  $$CachedVoiceSessionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedVoiceSessionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CachedVoiceSessionsTable> {
+  $$CachedVoiceSessionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedVoiceSessionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CachedVoiceSessionsTable> {
+  $$CachedVoiceSessionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => column);
+}
+
+class $$CachedVoiceSessionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CachedVoiceSessionsTable,
+          CachedVoiceSession,
+          $$CachedVoiceSessionsTableFilterComposer,
+          $$CachedVoiceSessionsTableOrderingComposer,
+          $$CachedVoiceSessionsTableAnnotationComposer,
+          $$CachedVoiceSessionsTableCreateCompanionBuilder,
+          $$CachedVoiceSessionsTableUpdateCompanionBuilder,
+          (
+            CachedVoiceSession,
+            BaseReferences<
+              _$AppDatabase,
+              $CachedVoiceSessionsTable,
+              CachedVoiceSession
+            >,
+          ),
+          CachedVoiceSession,
+          PrefetchHooks Function()
+        > {
+  $$CachedVoiceSessionsTableTableManager(
+    _$AppDatabase db,
+    $CachedVoiceSessionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedVoiceSessionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedVoiceSessionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CachedVoiceSessionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<DateTime> cachedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedVoiceSessionsCompanion(
+                id: id,
+                payload: payload,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String payload,
+                required DateTime cachedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedVoiceSessionsCompanion.insert(
+                id: id,
+                payload: payload,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedVoiceSessionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CachedVoiceSessionsTable,
+      CachedVoiceSession,
+      $$CachedVoiceSessionsTableFilterComposer,
+      $$CachedVoiceSessionsTableOrderingComposer,
+      $$CachedVoiceSessionsTableAnnotationComposer,
+      $$CachedVoiceSessionsTableCreateCompanionBuilder,
+      $$CachedVoiceSessionsTableUpdateCompanionBuilder,
+      (
+        CachedVoiceSession,
+        BaseReferences<
+          _$AppDatabase,
+          $CachedVoiceSessionsTable,
+          CachedVoiceSession
+        >,
+      ),
+      CachedVoiceSession,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedVoiceTurnsTableCreateCompanionBuilder =
+    CachedVoiceTurnsCompanion Function({
+      required String id,
+      required String sessionId,
+      required String payload,
+      Value<String?> tutorAudioId,
+      required DateTime cachedAt,
+      Value<int> rowid,
+    });
+typedef $$CachedVoiceTurnsTableUpdateCompanionBuilder =
+    CachedVoiceTurnsCompanion Function({
+      Value<String> id,
+      Value<String> sessionId,
+      Value<String> payload,
+      Value<String?> tutorAudioId,
+      Value<DateTime> cachedAt,
+      Value<int> rowid,
+    });
+
+class $$CachedVoiceTurnsTableFilterComposer
+    extends Composer<_$AppDatabase, $CachedVoiceTurnsTable> {
+  $$CachedVoiceTurnsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tutorAudioId => $composableBuilder(
+    column: $table.tutorAudioId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedVoiceTurnsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CachedVoiceTurnsTable> {
+  $$CachedVoiceTurnsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tutorAudioId => $composableBuilder(
+    column: $table.tutorAudioId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedVoiceTurnsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CachedVoiceTurnsTable> {
+  $$CachedVoiceTurnsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get sessionId =>
+      $composableBuilder(column: $table.sessionId, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<String> get tutorAudioId => $composableBuilder(
+    column: $table.tutorAudioId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => column);
+}
+
+class $$CachedVoiceTurnsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CachedVoiceTurnsTable,
+          CachedVoiceTurn,
+          $$CachedVoiceTurnsTableFilterComposer,
+          $$CachedVoiceTurnsTableOrderingComposer,
+          $$CachedVoiceTurnsTableAnnotationComposer,
+          $$CachedVoiceTurnsTableCreateCompanionBuilder,
+          $$CachedVoiceTurnsTableUpdateCompanionBuilder,
+          (
+            CachedVoiceTurn,
+            BaseReferences<
+              _$AppDatabase,
+              $CachedVoiceTurnsTable,
+              CachedVoiceTurn
+            >,
+          ),
+          CachedVoiceTurn,
+          PrefetchHooks Function()
+        > {
+  $$CachedVoiceTurnsTableTableManager(
+    _$AppDatabase db,
+    $CachedVoiceTurnsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedVoiceTurnsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedVoiceTurnsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedVoiceTurnsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> sessionId = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<String?> tutorAudioId = const Value.absent(),
+                Value<DateTime> cachedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedVoiceTurnsCompanion(
+                id: id,
+                sessionId: sessionId,
+                payload: payload,
+                tutorAudioId: tutorAudioId,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String sessionId,
+                required String payload,
+                Value<String?> tutorAudioId = const Value.absent(),
+                required DateTime cachedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedVoiceTurnsCompanion.insert(
+                id: id,
+                sessionId: sessionId,
+                payload: payload,
+                tutorAudioId: tutorAudioId,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedVoiceTurnsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CachedVoiceTurnsTable,
+      CachedVoiceTurn,
+      $$CachedVoiceTurnsTableFilterComposer,
+      $$CachedVoiceTurnsTableOrderingComposer,
+      $$CachedVoiceTurnsTableAnnotationComposer,
+      $$CachedVoiceTurnsTableCreateCompanionBuilder,
+      $$CachedVoiceTurnsTableUpdateCompanionBuilder,
+      (
+        CachedVoiceTurn,
+        BaseReferences<_$AppDatabase, $CachedVoiceTurnsTable, CachedVoiceTurn>,
+      ),
+      CachedVoiceTurn,
+      PrefetchHooks Function()
+    >;
+typedef $$VoicePreferencesTableCreateCompanionBuilder =
+    VoicePreferencesCompanion Function({
+      required String id,
+      required String payload,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$VoicePreferencesTableUpdateCompanionBuilder =
+    VoicePreferencesCompanion Function({
+      Value<String> id,
+      Value<String> payload,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$VoicePreferencesTableFilterComposer
+    extends Composer<_$AppDatabase, $VoicePreferencesTable> {
+  $$VoicePreferencesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$VoicePreferencesTableOrderingComposer
+    extends Composer<_$AppDatabase, $VoicePreferencesTable> {
+  $$VoicePreferencesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$VoicePreferencesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $VoicePreferencesTable> {
+  $$VoicePreferencesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$VoicePreferencesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $VoicePreferencesTable,
+          VoicePreference,
+          $$VoicePreferencesTableFilterComposer,
+          $$VoicePreferencesTableOrderingComposer,
+          $$VoicePreferencesTableAnnotationComposer,
+          $$VoicePreferencesTableCreateCompanionBuilder,
+          $$VoicePreferencesTableUpdateCompanionBuilder,
+          (
+            VoicePreference,
+            BaseReferences<
+              _$AppDatabase,
+              $VoicePreferencesTable,
+              VoicePreference
+            >,
+          ),
+          VoicePreference,
+          PrefetchHooks Function()
+        > {
+  $$VoicePreferencesTableTableManager(
+    _$AppDatabase db,
+    $VoicePreferencesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$VoicePreferencesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$VoicePreferencesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$VoicePreferencesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => VoicePreferencesCompanion(
+                id: id,
+                payload: payload,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String payload,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => VoicePreferencesCompanion.insert(
+                id: id,
+                payload: payload,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$VoicePreferencesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $VoicePreferencesTable,
+      VoicePreference,
+      $$VoicePreferencesTableFilterComposer,
+      $$VoicePreferencesTableOrderingComposer,
+      $$VoicePreferencesTableAnnotationComposer,
+      $$VoicePreferencesTableCreateCompanionBuilder,
+      $$VoicePreferencesTableUpdateCompanionBuilder,
+      (
+        VoicePreference,
+        BaseReferences<_$AppDatabase, $VoicePreferencesTable, VoicePreference>,
+      ),
+      VoicePreference,
+      PrefetchHooks Function()
+    >;
 typedef $$LocalLearnerProfilesTableCreateCompanionBuilder =
     LocalLearnerProfilesCompanion Function({
       required String id,
@@ -7583,6 +9046,12 @@ class $AppDatabaseManager {
       $$CachedTutorSummariesTableTableManager(_db, _db.cachedTutorSummaries);
   $$TutorDraftsTableTableManager get tutorDrafts =>
       $$TutorDraftsTableTableManager(_db, _db.tutorDrafts);
+  $$CachedVoiceSessionsTableTableManager get cachedVoiceSessions =>
+      $$CachedVoiceSessionsTableTableManager(_db, _db.cachedVoiceSessions);
+  $$CachedVoiceTurnsTableTableManager get cachedVoiceTurns =>
+      $$CachedVoiceTurnsTableTableManager(_db, _db.cachedVoiceTurns);
+  $$VoicePreferencesTableTableManager get voicePreferences =>
+      $$VoicePreferencesTableTableManager(_db, _db.voicePreferences);
   $$LocalLearnerProfilesTableTableManager get localLearnerProfiles =>
       $$LocalLearnerProfilesTableTableManager(_db, _db.localLearnerProfiles);
 }

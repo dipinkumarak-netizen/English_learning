@@ -78,11 +78,7 @@ def test_course_lessons_expose_stable_daily_sequence(client):
     auth = register(client)
     headers = auth_headers(auth)
     course = client.get("/api/v1/courses", headers=headers).json()["courses"][0]
-    lessons = [
-        lesson
-        for module in course["modules"]
-        for lesson in module["lessons"]
-    ]
+    lessons = [lesson for module in course["modules"] for lesson in module["lessons"]]
 
     assert [lesson["day_number"] for lesson in lessons] == list(range(1, 13))
     assert lessons[0]["unlocked"] is True
