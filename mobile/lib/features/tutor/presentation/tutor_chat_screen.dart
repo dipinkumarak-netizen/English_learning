@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/widgets/app_error_view.dart';
 import '../../../core/widgets/app_loading_indicator.dart';
@@ -28,56 +29,64 @@ class _TutorChatScreenState extends ConsumerState<TutorChatScreen> {
   @override
   Widget build(BuildContext context) {
     final messages = ref.watch(tutorMessagesProvider(widget.conversationId));
-    return Scaffold(
-      appBar: AppBar(title: const Text('Tutor conversation')),
-      body: Column(
-        children: [
-          Expanded(
-            child: messages.when(
-              loading: () => const AppLoadingIndicator(),
-              error: (error, _) => AppErrorView(
-                onRetry: () => ref.invalidate(
-                  tutorMessagesProvider(widget.conversationId),
+    final router = GoRouter.maybeOf(context);
+    final canPop = router != null && context.canPop();
+    return PopScope(
+      canPop: canPop,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && router != null) context.go('/tutor');
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Tutor conversation')),
+        body: Column(
+          children: [
+            Expanded(
+              child: messages.when(
+                loading: () => const AppLoadingIndicator(),
+                error: (error, _) => AppErrorView(
+                  onRetry: () => ref.invalidate(
+                    tutorMessagesProvider(widget.conversationId),
+                  ),
+                ),
+                data: (items) => ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: items.length,
+                  itemBuilder: (context, index) =>
+                      _MessageBubble(message: items[index]),
                 ),
               ),
-              data: (items) => ListView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(16),
-                itemCount: items.length,
-                itemBuilder: (context, index) =>
-                    _MessageBubble(message: items[index]),
-              ),
             ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      maxLines: 4,
-                      minLines: 1,
-                      enabled: !_sending,
-                      decoration: const InputDecoration(
-                        hintText: 'Write an English-learning message',
-                        border: OutlineInputBorder(),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        maxLines: 4,
+                        minLines: 1,
+                        enabled: !_sending,
+                        decoration: const InputDecoration(
+                          hintText: 'Write an English-learning message',
+                          border: OutlineInputBorder(),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton.filled(
-                    tooltip: 'Send message',
-                    onPressed: _sending ? null : _send,
-                    icon: const Icon(Icons.send),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    IconButton.filled(
+                      tooltip: 'Send message',
+                      onPressed: _sending ? null : _send,
+                      icon: const Icon(Icons.send),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -172,7 +172,7 @@ class _TutorHomeScreenState extends ConsumerState<TutorHomeScreen> {
                               item['mode'] as String? ?? 'Practice',
                             ),
                             onTap: () =>
-                                context.go('/tutor/chat/${item['id']}'),
+                                context.push('/tutor/chat/${item['id']}'),
                           ),
                         )
                         .toList(),
@@ -190,7 +190,7 @@ class _TutorHomeScreenState extends ConsumerState<TutorHomeScreen> {
           .read(tutorRepositoryProvider)
           .createConversation(_mode, 'important');
       if (mounted) {
-        context.go('/tutor/chat/${conversation['id']}');
+        context.push('/tutor/chat/${conversation['id']}');
       }
     } catch (_) {
       if (mounted) {

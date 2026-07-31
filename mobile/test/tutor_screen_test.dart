@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nilaspeak_mobile/features/tutor/presentation/mistake_notebook_screen.dart';
 import 'package:nilaspeak_mobile/features/tutor/presentation/tutor_chat_screen.dart';
 import 'package:nilaspeak_mobile/features/tutor/presentation/tutor_home_screen.dart';
@@ -72,6 +73,50 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Try a short sentence.'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
+  });
+
+  testWidgets('pushed tutor conversation returns to the tutor root on back', (
+    tester,
+  ) async {
+    final router = GoRouter(
+      initialLocation: '/tutor',
+      routes: [
+        GoRoute(
+          path: '/tutor',
+          builder: (_, _) => const Scaffold(body: Text('AI Tutor root')),
+          routes: [
+            GoRoute(
+              path: 'chat/:conversationId',
+              builder: (_, state) => TutorChatScreen(
+                conversationId: state.pathParameters['conversationId']!,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          tutorMessagesProvider(
+            'conversation-1',
+          ).overrideWith((_) async => const []),
+        ],
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('AI Tutor root'), findsOneWidget);
+
+    router.push('/tutor/chat/conversation-1');
+    await tester.pumpAndSettle();
+    expect(find.text('Tutor conversation'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+    expect(find.text('AI Tutor root'), findsOneWidget);
+    expect(find.text('Tutor conversation'), findsNothing);
   });
 
   testWidgets('mistake notebook renders cached correction', (tester) async {
