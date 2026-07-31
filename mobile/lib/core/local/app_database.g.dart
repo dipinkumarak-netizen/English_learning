@@ -2548,6 +2548,1408 @@ class CacheMetadataCompanion extends UpdateCompanion<CacheMetadataData> {
   }
 }
 
+class $CachedTutorConversationsTable extends CachedTutorConversations
+    with TableInfo<$CachedTutorConversationsTable, CachedTutorConversation> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedTutorConversationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cachedAtMeta = const VerificationMeta(
+    'cachedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> cachedAt = GeneratedColumn<DateTime>(
+    'cached_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, payload, cachedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_tutor_conversations';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedTutorConversation> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    if (data.containsKey('cached_at')) {
+      context.handle(
+        _cachedAtMeta,
+        cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cachedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CachedTutorConversation map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedTutorConversation(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      cachedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cached_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedTutorConversationsTable createAlias(String alias) {
+    return $CachedTutorConversationsTable(attachedDatabase, alias);
+  }
+}
+
+class CachedTutorConversation extends DataClass
+    implements Insertable<CachedTutorConversation> {
+  final String id;
+  final String payload;
+  final DateTime cachedAt;
+  const CachedTutorConversation({
+    required this.id,
+    required this.payload,
+    required this.cachedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['payload'] = Variable<String>(payload);
+    map['cached_at'] = Variable<DateTime>(cachedAt);
+    return map;
+  }
+
+  CachedTutorConversationsCompanion toCompanion(bool nullToAbsent) {
+    return CachedTutorConversationsCompanion(
+      id: Value(id),
+      payload: Value(payload),
+      cachedAt: Value(cachedAt),
+    );
+  }
+
+  factory CachedTutorConversation.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedTutorConversation(
+      id: serializer.fromJson<String>(json['id']),
+      payload: serializer.fromJson<String>(json['payload']),
+      cachedAt: serializer.fromJson<DateTime>(json['cachedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'payload': serializer.toJson<String>(payload),
+      'cachedAt': serializer.toJson<DateTime>(cachedAt),
+    };
+  }
+
+  CachedTutorConversation copyWith({
+    String? id,
+    String? payload,
+    DateTime? cachedAt,
+  }) => CachedTutorConversation(
+    id: id ?? this.id,
+    payload: payload ?? this.payload,
+    cachedAt: cachedAt ?? this.cachedAt,
+  );
+  CachedTutorConversation copyWithCompanion(
+    CachedTutorConversationsCompanion data,
+  ) {
+    return CachedTutorConversation(
+      id: data.id.present ? data.id.value : this.id,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      cachedAt: data.cachedAt.present ? data.cachedAt.value : this.cachedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedTutorConversation(')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('cachedAt: $cachedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, payload, cachedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedTutorConversation &&
+          other.id == this.id &&
+          other.payload == this.payload &&
+          other.cachedAt == this.cachedAt);
+}
+
+class CachedTutorConversationsCompanion
+    extends UpdateCompanion<CachedTutorConversation> {
+  final Value<String> id;
+  final Value<String> payload;
+  final Value<DateTime> cachedAt;
+  final Value<int> rowid;
+  const CachedTutorConversationsCompanion({
+    this.id = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.cachedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedTutorConversationsCompanion.insert({
+    required String id,
+    required String payload,
+    required DateTime cachedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       payload = Value(payload),
+       cachedAt = Value(cachedAt);
+  static Insertable<CachedTutorConversation> custom({
+    Expression<String>? id,
+    Expression<String>? payload,
+    Expression<DateTime>? cachedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (payload != null) 'payload': payload,
+      if (cachedAt != null) 'cached_at': cachedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedTutorConversationsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? payload,
+    Value<DateTime>? cachedAt,
+    Value<int>? rowid,
+  }) {
+    return CachedTutorConversationsCompanion(
+      id: id ?? this.id,
+      payload: payload ?? this.payload,
+      cachedAt: cachedAt ?? this.cachedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (cachedAt.present) {
+      map['cached_at'] = Variable<DateTime>(cachedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedTutorConversationsCompanion(')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('cachedAt: $cachedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedTutorMessagesTable extends CachedTutorMessages
+    with TableInfo<$CachedTutorMessagesTable, CachedTutorMessage> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedTutorMessagesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _conversationIdMeta = const VerificationMeta(
+    'conversationId',
+  );
+  @override
+  late final GeneratedColumn<String> conversationId = GeneratedColumn<String>(
+    'conversation_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cachedAtMeta = const VerificationMeta(
+    'cachedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> cachedAt = GeneratedColumn<DateTime>(
+    'cached_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, conversationId, payload, cachedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_tutor_messages';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedTutorMessage> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('conversation_id')) {
+      context.handle(
+        _conversationIdMeta,
+        conversationId.isAcceptableOrUnknown(
+          data['conversation_id']!,
+          _conversationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_conversationIdMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    if (data.containsKey('cached_at')) {
+      context.handle(
+        _cachedAtMeta,
+        cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cachedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CachedTutorMessage map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedTutorMessage(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      conversationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}conversation_id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      cachedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cached_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedTutorMessagesTable createAlias(String alias) {
+    return $CachedTutorMessagesTable(attachedDatabase, alias);
+  }
+}
+
+class CachedTutorMessage extends DataClass
+    implements Insertable<CachedTutorMessage> {
+  final String id;
+  final String conversationId;
+  final String payload;
+  final DateTime cachedAt;
+  const CachedTutorMessage({
+    required this.id,
+    required this.conversationId,
+    required this.payload,
+    required this.cachedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['conversation_id'] = Variable<String>(conversationId);
+    map['payload'] = Variable<String>(payload);
+    map['cached_at'] = Variable<DateTime>(cachedAt);
+    return map;
+  }
+
+  CachedTutorMessagesCompanion toCompanion(bool nullToAbsent) {
+    return CachedTutorMessagesCompanion(
+      id: Value(id),
+      conversationId: Value(conversationId),
+      payload: Value(payload),
+      cachedAt: Value(cachedAt),
+    );
+  }
+
+  factory CachedTutorMessage.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedTutorMessage(
+      id: serializer.fromJson<String>(json['id']),
+      conversationId: serializer.fromJson<String>(json['conversationId']),
+      payload: serializer.fromJson<String>(json['payload']),
+      cachedAt: serializer.fromJson<DateTime>(json['cachedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'conversationId': serializer.toJson<String>(conversationId),
+      'payload': serializer.toJson<String>(payload),
+      'cachedAt': serializer.toJson<DateTime>(cachedAt),
+    };
+  }
+
+  CachedTutorMessage copyWith({
+    String? id,
+    String? conversationId,
+    String? payload,
+    DateTime? cachedAt,
+  }) => CachedTutorMessage(
+    id: id ?? this.id,
+    conversationId: conversationId ?? this.conversationId,
+    payload: payload ?? this.payload,
+    cachedAt: cachedAt ?? this.cachedAt,
+  );
+  CachedTutorMessage copyWithCompanion(CachedTutorMessagesCompanion data) {
+    return CachedTutorMessage(
+      id: data.id.present ? data.id.value : this.id,
+      conversationId: data.conversationId.present
+          ? data.conversationId.value
+          : this.conversationId,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      cachedAt: data.cachedAt.present ? data.cachedAt.value : this.cachedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedTutorMessage(')
+          ..write('id: $id, ')
+          ..write('conversationId: $conversationId, ')
+          ..write('payload: $payload, ')
+          ..write('cachedAt: $cachedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, conversationId, payload, cachedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedTutorMessage &&
+          other.id == this.id &&
+          other.conversationId == this.conversationId &&
+          other.payload == this.payload &&
+          other.cachedAt == this.cachedAt);
+}
+
+class CachedTutorMessagesCompanion extends UpdateCompanion<CachedTutorMessage> {
+  final Value<String> id;
+  final Value<String> conversationId;
+  final Value<String> payload;
+  final Value<DateTime> cachedAt;
+  final Value<int> rowid;
+  const CachedTutorMessagesCompanion({
+    this.id = const Value.absent(),
+    this.conversationId = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.cachedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedTutorMessagesCompanion.insert({
+    required String id,
+    required String conversationId,
+    required String payload,
+    required DateTime cachedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       conversationId = Value(conversationId),
+       payload = Value(payload),
+       cachedAt = Value(cachedAt);
+  static Insertable<CachedTutorMessage> custom({
+    Expression<String>? id,
+    Expression<String>? conversationId,
+    Expression<String>? payload,
+    Expression<DateTime>? cachedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (conversationId != null) 'conversation_id': conversationId,
+      if (payload != null) 'payload': payload,
+      if (cachedAt != null) 'cached_at': cachedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedTutorMessagesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? conversationId,
+    Value<String>? payload,
+    Value<DateTime>? cachedAt,
+    Value<int>? rowid,
+  }) {
+    return CachedTutorMessagesCompanion(
+      id: id ?? this.id,
+      conversationId: conversationId ?? this.conversationId,
+      payload: payload ?? this.payload,
+      cachedAt: cachedAt ?? this.cachedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (conversationId.present) {
+      map['conversation_id'] = Variable<String>(conversationId.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (cachedAt.present) {
+      map['cached_at'] = Variable<DateTime>(cachedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedTutorMessagesCompanion(')
+          ..write('id: $id, ')
+          ..write('conversationId: $conversationId, ')
+          ..write('payload: $payload, ')
+          ..write('cachedAt: $cachedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedTutorMistakesTable extends CachedTutorMistakes
+    with TableInfo<$CachedTutorMistakesTable, CachedTutorMistake> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedTutorMistakesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cachedAtMeta = const VerificationMeta(
+    'cachedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> cachedAt = GeneratedColumn<DateTime>(
+    'cached_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, payload, cachedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_tutor_mistakes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedTutorMistake> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    if (data.containsKey('cached_at')) {
+      context.handle(
+        _cachedAtMeta,
+        cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cachedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CachedTutorMistake map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedTutorMistake(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      cachedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cached_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedTutorMistakesTable createAlias(String alias) {
+    return $CachedTutorMistakesTable(attachedDatabase, alias);
+  }
+}
+
+class CachedTutorMistake extends DataClass
+    implements Insertable<CachedTutorMistake> {
+  final String id;
+  final String payload;
+  final DateTime cachedAt;
+  const CachedTutorMistake({
+    required this.id,
+    required this.payload,
+    required this.cachedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['payload'] = Variable<String>(payload);
+    map['cached_at'] = Variable<DateTime>(cachedAt);
+    return map;
+  }
+
+  CachedTutorMistakesCompanion toCompanion(bool nullToAbsent) {
+    return CachedTutorMistakesCompanion(
+      id: Value(id),
+      payload: Value(payload),
+      cachedAt: Value(cachedAt),
+    );
+  }
+
+  factory CachedTutorMistake.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedTutorMistake(
+      id: serializer.fromJson<String>(json['id']),
+      payload: serializer.fromJson<String>(json['payload']),
+      cachedAt: serializer.fromJson<DateTime>(json['cachedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'payload': serializer.toJson<String>(payload),
+      'cachedAt': serializer.toJson<DateTime>(cachedAt),
+    };
+  }
+
+  CachedTutorMistake copyWith({
+    String? id,
+    String? payload,
+    DateTime? cachedAt,
+  }) => CachedTutorMistake(
+    id: id ?? this.id,
+    payload: payload ?? this.payload,
+    cachedAt: cachedAt ?? this.cachedAt,
+  );
+  CachedTutorMistake copyWithCompanion(CachedTutorMistakesCompanion data) {
+    return CachedTutorMistake(
+      id: data.id.present ? data.id.value : this.id,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      cachedAt: data.cachedAt.present ? data.cachedAt.value : this.cachedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedTutorMistake(')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('cachedAt: $cachedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, payload, cachedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedTutorMistake &&
+          other.id == this.id &&
+          other.payload == this.payload &&
+          other.cachedAt == this.cachedAt);
+}
+
+class CachedTutorMistakesCompanion extends UpdateCompanion<CachedTutorMistake> {
+  final Value<String> id;
+  final Value<String> payload;
+  final Value<DateTime> cachedAt;
+  final Value<int> rowid;
+  const CachedTutorMistakesCompanion({
+    this.id = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.cachedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedTutorMistakesCompanion.insert({
+    required String id,
+    required String payload,
+    required DateTime cachedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       payload = Value(payload),
+       cachedAt = Value(cachedAt);
+  static Insertable<CachedTutorMistake> custom({
+    Expression<String>? id,
+    Expression<String>? payload,
+    Expression<DateTime>? cachedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (payload != null) 'payload': payload,
+      if (cachedAt != null) 'cached_at': cachedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedTutorMistakesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? payload,
+    Value<DateTime>? cachedAt,
+    Value<int>? rowid,
+  }) {
+    return CachedTutorMistakesCompanion(
+      id: id ?? this.id,
+      payload: payload ?? this.payload,
+      cachedAt: cachedAt ?? this.cachedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (cachedAt.present) {
+      map['cached_at'] = Variable<DateTime>(cachedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedTutorMistakesCompanion(')
+          ..write('id: $id, ')
+          ..write('payload: $payload, ')
+          ..write('cachedAt: $cachedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedTutorSummariesTable extends CachedTutorSummaries
+    with TableInfo<$CachedTutorSummariesTable, CachedTutorSummary> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedTutorSummariesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _conversationIdMeta = const VerificationMeta(
+    'conversationId',
+  );
+  @override
+  late final GeneratedColumn<String> conversationId = GeneratedColumn<String>(
+    'conversation_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cachedAtMeta = const VerificationMeta(
+    'cachedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> cachedAt = GeneratedColumn<DateTime>(
+    'cached_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [conversationId, payload, cachedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_tutor_summaries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedTutorSummary> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('conversation_id')) {
+      context.handle(
+        _conversationIdMeta,
+        conversationId.isAcceptableOrUnknown(
+          data['conversation_id']!,
+          _conversationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_conversationIdMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    if (data.containsKey('cached_at')) {
+      context.handle(
+        _cachedAtMeta,
+        cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cachedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {conversationId};
+  @override
+  CachedTutorSummary map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedTutorSummary(
+      conversationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}conversation_id'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      cachedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cached_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedTutorSummariesTable createAlias(String alias) {
+    return $CachedTutorSummariesTable(attachedDatabase, alias);
+  }
+}
+
+class CachedTutorSummary extends DataClass
+    implements Insertable<CachedTutorSummary> {
+  final String conversationId;
+  final String payload;
+  final DateTime cachedAt;
+  const CachedTutorSummary({
+    required this.conversationId,
+    required this.payload,
+    required this.cachedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['conversation_id'] = Variable<String>(conversationId);
+    map['payload'] = Variable<String>(payload);
+    map['cached_at'] = Variable<DateTime>(cachedAt);
+    return map;
+  }
+
+  CachedTutorSummariesCompanion toCompanion(bool nullToAbsent) {
+    return CachedTutorSummariesCompanion(
+      conversationId: Value(conversationId),
+      payload: Value(payload),
+      cachedAt: Value(cachedAt),
+    );
+  }
+
+  factory CachedTutorSummary.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedTutorSummary(
+      conversationId: serializer.fromJson<String>(json['conversationId']),
+      payload: serializer.fromJson<String>(json['payload']),
+      cachedAt: serializer.fromJson<DateTime>(json['cachedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'conversationId': serializer.toJson<String>(conversationId),
+      'payload': serializer.toJson<String>(payload),
+      'cachedAt': serializer.toJson<DateTime>(cachedAt),
+    };
+  }
+
+  CachedTutorSummary copyWith({
+    String? conversationId,
+    String? payload,
+    DateTime? cachedAt,
+  }) => CachedTutorSummary(
+    conversationId: conversationId ?? this.conversationId,
+    payload: payload ?? this.payload,
+    cachedAt: cachedAt ?? this.cachedAt,
+  );
+  CachedTutorSummary copyWithCompanion(CachedTutorSummariesCompanion data) {
+    return CachedTutorSummary(
+      conversationId: data.conversationId.present
+          ? data.conversationId.value
+          : this.conversationId,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      cachedAt: data.cachedAt.present ? data.cachedAt.value : this.cachedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedTutorSummary(')
+          ..write('conversationId: $conversationId, ')
+          ..write('payload: $payload, ')
+          ..write('cachedAt: $cachedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(conversationId, payload, cachedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedTutorSummary &&
+          other.conversationId == this.conversationId &&
+          other.payload == this.payload &&
+          other.cachedAt == this.cachedAt);
+}
+
+class CachedTutorSummariesCompanion
+    extends UpdateCompanion<CachedTutorSummary> {
+  final Value<String> conversationId;
+  final Value<String> payload;
+  final Value<DateTime> cachedAt;
+  final Value<int> rowid;
+  const CachedTutorSummariesCompanion({
+    this.conversationId = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.cachedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedTutorSummariesCompanion.insert({
+    required String conversationId,
+    required String payload,
+    required DateTime cachedAt,
+    this.rowid = const Value.absent(),
+  }) : conversationId = Value(conversationId),
+       payload = Value(payload),
+       cachedAt = Value(cachedAt);
+  static Insertable<CachedTutorSummary> custom({
+    Expression<String>? conversationId,
+    Expression<String>? payload,
+    Expression<DateTime>? cachedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (conversationId != null) 'conversation_id': conversationId,
+      if (payload != null) 'payload': payload,
+      if (cachedAt != null) 'cached_at': cachedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedTutorSummariesCompanion copyWith({
+    Value<String>? conversationId,
+    Value<String>? payload,
+    Value<DateTime>? cachedAt,
+    Value<int>? rowid,
+  }) {
+    return CachedTutorSummariesCompanion(
+      conversationId: conversationId ?? this.conversationId,
+      payload: payload ?? this.payload,
+      cachedAt: cachedAt ?? this.cachedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (conversationId.present) {
+      map['conversation_id'] = Variable<String>(conversationId.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (cachedAt.present) {
+      map['cached_at'] = Variable<DateTime>(cachedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedTutorSummariesCompanion(')
+          ..write('conversationId: $conversationId, ')
+          ..write('payload: $payload, ')
+          ..write('cachedAt: $cachedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TutorDraftsTable extends TutorDrafts
+    with TableInfo<$TutorDraftsTable, TutorDraft> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TutorDraftsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _conversationIdMeta = const VerificationMeta(
+    'conversationId',
+  );
+  @override
+  late final GeneratedColumn<String> conversationId = GeneratedColumn<String>(
+    'conversation_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _draftTextMeta = const VerificationMeta(
+    'draftText',
+  );
+  @override
+  late final GeneratedColumn<String> draftText = GeneratedColumn<String>(
+    'draft_text',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [conversationId, draftText, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tutor_drafts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TutorDraft> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('conversation_id')) {
+      context.handle(
+        _conversationIdMeta,
+        conversationId.isAcceptableOrUnknown(
+          data['conversation_id']!,
+          _conversationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_conversationIdMeta);
+    }
+    if (data.containsKey('draft_text')) {
+      context.handle(
+        _draftTextMeta,
+        draftText.isAcceptableOrUnknown(data['draft_text']!, _draftTextMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_draftTextMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {conversationId};
+  @override
+  TutorDraft map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TutorDraft(
+      conversationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}conversation_id'],
+      )!,
+      draftText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}draft_text'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $TutorDraftsTable createAlias(String alias) {
+    return $TutorDraftsTable(attachedDatabase, alias);
+  }
+}
+
+class TutorDraft extends DataClass implements Insertable<TutorDraft> {
+  final String conversationId;
+  final String draftText;
+  final DateTime updatedAt;
+  const TutorDraft({
+    required this.conversationId,
+    required this.draftText,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['conversation_id'] = Variable<String>(conversationId);
+    map['draft_text'] = Variable<String>(draftText);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  TutorDraftsCompanion toCompanion(bool nullToAbsent) {
+    return TutorDraftsCompanion(
+      conversationId: Value(conversationId),
+      draftText: Value(draftText),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory TutorDraft.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TutorDraft(
+      conversationId: serializer.fromJson<String>(json['conversationId']),
+      draftText: serializer.fromJson<String>(json['draftText']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'conversationId': serializer.toJson<String>(conversationId),
+      'draftText': serializer.toJson<String>(draftText),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  TutorDraft copyWith({
+    String? conversationId,
+    String? draftText,
+    DateTime? updatedAt,
+  }) => TutorDraft(
+    conversationId: conversationId ?? this.conversationId,
+    draftText: draftText ?? this.draftText,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  TutorDraft copyWithCompanion(TutorDraftsCompanion data) {
+    return TutorDraft(
+      conversationId: data.conversationId.present
+          ? data.conversationId.value
+          : this.conversationId,
+      draftText: data.draftText.present ? data.draftText.value : this.draftText,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TutorDraft(')
+          ..write('conversationId: $conversationId, ')
+          ..write('draftText: $draftText, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(conversationId, draftText, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TutorDraft &&
+          other.conversationId == this.conversationId &&
+          other.draftText == this.draftText &&
+          other.updatedAt == this.updatedAt);
+}
+
+class TutorDraftsCompanion extends UpdateCompanion<TutorDraft> {
+  final Value<String> conversationId;
+  final Value<String> draftText;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const TutorDraftsCompanion({
+    this.conversationId = const Value.absent(),
+    this.draftText = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TutorDraftsCompanion.insert({
+    required String conversationId,
+    required String draftText,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : conversationId = Value(conversationId),
+       draftText = Value(draftText),
+       updatedAt = Value(updatedAt);
+  static Insertable<TutorDraft> custom({
+    Expression<String>? conversationId,
+    Expression<String>? draftText,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (conversationId != null) 'conversation_id': conversationId,
+      if (draftText != null) 'draft_text': draftText,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TutorDraftsCompanion copyWith({
+    Value<String>? conversationId,
+    Value<String>? draftText,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return TutorDraftsCompanion(
+      conversationId: conversationId ?? this.conversationId,
+      draftText: draftText ?? this.draftText,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (conversationId.present) {
+      map['conversation_id'] = Variable<String>(conversationId.value);
+    }
+    if (draftText.present) {
+      map['draft_text'] = Variable<String>(draftText.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TutorDraftsCompanion(')
+          ..write('conversationId: $conversationId, ')
+          ..write('draftText: $draftText, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2561,6 +3963,15 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PendingSyncOperationsTable pendingSyncOperations =
       $PendingSyncOperationsTable(this);
   late final $CacheMetadataTable cacheMetadata = $CacheMetadataTable(this);
+  late final $CachedTutorConversationsTable cachedTutorConversations =
+      $CachedTutorConversationsTable(this);
+  late final $CachedTutorMessagesTable cachedTutorMessages =
+      $CachedTutorMessagesTable(this);
+  late final $CachedTutorMistakesTable cachedTutorMistakes =
+      $CachedTutorMistakesTable(this);
+  late final $CachedTutorSummariesTable cachedTutorSummaries =
+      $CachedTutorSummariesTable(this);
+  late final $TutorDraftsTable tutorDrafts = $TutorDraftsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2573,6 +3984,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     localLessonProgress,
     pendingSyncOperations,
     cacheMetadata,
+    cachedTutorConversations,
+    cachedTutorMessages,
+    cachedTutorMistakes,
+    cachedTutorSummaries,
+    tutorDrafts,
   ];
 }
 
@@ -4029,6 +5445,908 @@ typedef $$CacheMetadataTableProcessedTableManager =
       CacheMetadataData,
       PrefetchHooks Function()
     >;
+typedef $$CachedTutorConversationsTableCreateCompanionBuilder =
+    CachedTutorConversationsCompanion Function({
+      required String id,
+      required String payload,
+      required DateTime cachedAt,
+      Value<int> rowid,
+    });
+typedef $$CachedTutorConversationsTableUpdateCompanionBuilder =
+    CachedTutorConversationsCompanion Function({
+      Value<String> id,
+      Value<String> payload,
+      Value<DateTime> cachedAt,
+      Value<int> rowid,
+    });
+
+class $$CachedTutorConversationsTableFilterComposer
+    extends Composer<_$AppDatabase, $CachedTutorConversationsTable> {
+  $$CachedTutorConversationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedTutorConversationsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CachedTutorConversationsTable> {
+  $$CachedTutorConversationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedTutorConversationsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CachedTutorConversationsTable> {
+  $$CachedTutorConversationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => column);
+}
+
+class $$CachedTutorConversationsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CachedTutorConversationsTable,
+          CachedTutorConversation,
+          $$CachedTutorConversationsTableFilterComposer,
+          $$CachedTutorConversationsTableOrderingComposer,
+          $$CachedTutorConversationsTableAnnotationComposer,
+          $$CachedTutorConversationsTableCreateCompanionBuilder,
+          $$CachedTutorConversationsTableUpdateCompanionBuilder,
+          (
+            CachedTutorConversation,
+            BaseReferences<
+              _$AppDatabase,
+              $CachedTutorConversationsTable,
+              CachedTutorConversation
+            >,
+          ),
+          CachedTutorConversation,
+          PrefetchHooks Function()
+        > {
+  $$CachedTutorConversationsTableTableManager(
+    _$AppDatabase db,
+    $CachedTutorConversationsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedTutorConversationsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$CachedTutorConversationsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CachedTutorConversationsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<DateTime> cachedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedTutorConversationsCompanion(
+                id: id,
+                payload: payload,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String payload,
+                required DateTime cachedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedTutorConversationsCompanion.insert(
+                id: id,
+                payload: payload,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedTutorConversationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CachedTutorConversationsTable,
+      CachedTutorConversation,
+      $$CachedTutorConversationsTableFilterComposer,
+      $$CachedTutorConversationsTableOrderingComposer,
+      $$CachedTutorConversationsTableAnnotationComposer,
+      $$CachedTutorConversationsTableCreateCompanionBuilder,
+      $$CachedTutorConversationsTableUpdateCompanionBuilder,
+      (
+        CachedTutorConversation,
+        BaseReferences<
+          _$AppDatabase,
+          $CachedTutorConversationsTable,
+          CachedTutorConversation
+        >,
+      ),
+      CachedTutorConversation,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedTutorMessagesTableCreateCompanionBuilder =
+    CachedTutorMessagesCompanion Function({
+      required String id,
+      required String conversationId,
+      required String payload,
+      required DateTime cachedAt,
+      Value<int> rowid,
+    });
+typedef $$CachedTutorMessagesTableUpdateCompanionBuilder =
+    CachedTutorMessagesCompanion Function({
+      Value<String> id,
+      Value<String> conversationId,
+      Value<String> payload,
+      Value<DateTime> cachedAt,
+      Value<int> rowid,
+    });
+
+class $$CachedTutorMessagesTableFilterComposer
+    extends Composer<_$AppDatabase, $CachedTutorMessagesTable> {
+  $$CachedTutorMessagesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get conversationId => $composableBuilder(
+    column: $table.conversationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedTutorMessagesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CachedTutorMessagesTable> {
+  $$CachedTutorMessagesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get conversationId => $composableBuilder(
+    column: $table.conversationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedTutorMessagesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CachedTutorMessagesTable> {
+  $$CachedTutorMessagesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get conversationId => $composableBuilder(
+    column: $table.conversationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => column);
+}
+
+class $$CachedTutorMessagesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CachedTutorMessagesTable,
+          CachedTutorMessage,
+          $$CachedTutorMessagesTableFilterComposer,
+          $$CachedTutorMessagesTableOrderingComposer,
+          $$CachedTutorMessagesTableAnnotationComposer,
+          $$CachedTutorMessagesTableCreateCompanionBuilder,
+          $$CachedTutorMessagesTableUpdateCompanionBuilder,
+          (
+            CachedTutorMessage,
+            BaseReferences<
+              _$AppDatabase,
+              $CachedTutorMessagesTable,
+              CachedTutorMessage
+            >,
+          ),
+          CachedTutorMessage,
+          PrefetchHooks Function()
+        > {
+  $$CachedTutorMessagesTableTableManager(
+    _$AppDatabase db,
+    $CachedTutorMessagesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedTutorMessagesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedTutorMessagesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CachedTutorMessagesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> conversationId = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<DateTime> cachedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedTutorMessagesCompanion(
+                id: id,
+                conversationId: conversationId,
+                payload: payload,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String conversationId,
+                required String payload,
+                required DateTime cachedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedTutorMessagesCompanion.insert(
+                id: id,
+                conversationId: conversationId,
+                payload: payload,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedTutorMessagesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CachedTutorMessagesTable,
+      CachedTutorMessage,
+      $$CachedTutorMessagesTableFilterComposer,
+      $$CachedTutorMessagesTableOrderingComposer,
+      $$CachedTutorMessagesTableAnnotationComposer,
+      $$CachedTutorMessagesTableCreateCompanionBuilder,
+      $$CachedTutorMessagesTableUpdateCompanionBuilder,
+      (
+        CachedTutorMessage,
+        BaseReferences<
+          _$AppDatabase,
+          $CachedTutorMessagesTable,
+          CachedTutorMessage
+        >,
+      ),
+      CachedTutorMessage,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedTutorMistakesTableCreateCompanionBuilder =
+    CachedTutorMistakesCompanion Function({
+      required String id,
+      required String payload,
+      required DateTime cachedAt,
+      Value<int> rowid,
+    });
+typedef $$CachedTutorMistakesTableUpdateCompanionBuilder =
+    CachedTutorMistakesCompanion Function({
+      Value<String> id,
+      Value<String> payload,
+      Value<DateTime> cachedAt,
+      Value<int> rowid,
+    });
+
+class $$CachedTutorMistakesTableFilterComposer
+    extends Composer<_$AppDatabase, $CachedTutorMistakesTable> {
+  $$CachedTutorMistakesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedTutorMistakesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CachedTutorMistakesTable> {
+  $$CachedTutorMistakesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedTutorMistakesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CachedTutorMistakesTable> {
+  $$CachedTutorMistakesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => column);
+}
+
+class $$CachedTutorMistakesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CachedTutorMistakesTable,
+          CachedTutorMistake,
+          $$CachedTutorMistakesTableFilterComposer,
+          $$CachedTutorMistakesTableOrderingComposer,
+          $$CachedTutorMistakesTableAnnotationComposer,
+          $$CachedTutorMistakesTableCreateCompanionBuilder,
+          $$CachedTutorMistakesTableUpdateCompanionBuilder,
+          (
+            CachedTutorMistake,
+            BaseReferences<
+              _$AppDatabase,
+              $CachedTutorMistakesTable,
+              CachedTutorMistake
+            >,
+          ),
+          CachedTutorMistake,
+          PrefetchHooks Function()
+        > {
+  $$CachedTutorMistakesTableTableManager(
+    _$AppDatabase db,
+    $CachedTutorMistakesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedTutorMistakesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedTutorMistakesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CachedTutorMistakesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<DateTime> cachedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedTutorMistakesCompanion(
+                id: id,
+                payload: payload,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String payload,
+                required DateTime cachedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedTutorMistakesCompanion.insert(
+                id: id,
+                payload: payload,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedTutorMistakesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CachedTutorMistakesTable,
+      CachedTutorMistake,
+      $$CachedTutorMistakesTableFilterComposer,
+      $$CachedTutorMistakesTableOrderingComposer,
+      $$CachedTutorMistakesTableAnnotationComposer,
+      $$CachedTutorMistakesTableCreateCompanionBuilder,
+      $$CachedTutorMistakesTableUpdateCompanionBuilder,
+      (
+        CachedTutorMistake,
+        BaseReferences<
+          _$AppDatabase,
+          $CachedTutorMistakesTable,
+          CachedTutorMistake
+        >,
+      ),
+      CachedTutorMistake,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedTutorSummariesTableCreateCompanionBuilder =
+    CachedTutorSummariesCompanion Function({
+      required String conversationId,
+      required String payload,
+      required DateTime cachedAt,
+      Value<int> rowid,
+    });
+typedef $$CachedTutorSummariesTableUpdateCompanionBuilder =
+    CachedTutorSummariesCompanion Function({
+      Value<String> conversationId,
+      Value<String> payload,
+      Value<DateTime> cachedAt,
+      Value<int> rowid,
+    });
+
+class $$CachedTutorSummariesTableFilterComposer
+    extends Composer<_$AppDatabase, $CachedTutorSummariesTable> {
+  $$CachedTutorSummariesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get conversationId => $composableBuilder(
+    column: $table.conversationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedTutorSummariesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CachedTutorSummariesTable> {
+  $$CachedTutorSummariesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get conversationId => $composableBuilder(
+    column: $table.conversationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedTutorSummariesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CachedTutorSummariesTable> {
+  $$CachedTutorSummariesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get conversationId => $composableBuilder(
+    column: $table.conversationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => column);
+}
+
+class $$CachedTutorSummariesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CachedTutorSummariesTable,
+          CachedTutorSummary,
+          $$CachedTutorSummariesTableFilterComposer,
+          $$CachedTutorSummariesTableOrderingComposer,
+          $$CachedTutorSummariesTableAnnotationComposer,
+          $$CachedTutorSummariesTableCreateCompanionBuilder,
+          $$CachedTutorSummariesTableUpdateCompanionBuilder,
+          (
+            CachedTutorSummary,
+            BaseReferences<
+              _$AppDatabase,
+              $CachedTutorSummariesTable,
+              CachedTutorSummary
+            >,
+          ),
+          CachedTutorSummary,
+          PrefetchHooks Function()
+        > {
+  $$CachedTutorSummariesTableTableManager(
+    _$AppDatabase db,
+    $CachedTutorSummariesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedTutorSummariesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedTutorSummariesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CachedTutorSummariesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> conversationId = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<DateTime> cachedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedTutorSummariesCompanion(
+                conversationId: conversationId,
+                payload: payload,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String conversationId,
+                required String payload,
+                required DateTime cachedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedTutorSummariesCompanion.insert(
+                conversationId: conversationId,
+                payload: payload,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedTutorSummariesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CachedTutorSummariesTable,
+      CachedTutorSummary,
+      $$CachedTutorSummariesTableFilterComposer,
+      $$CachedTutorSummariesTableOrderingComposer,
+      $$CachedTutorSummariesTableAnnotationComposer,
+      $$CachedTutorSummariesTableCreateCompanionBuilder,
+      $$CachedTutorSummariesTableUpdateCompanionBuilder,
+      (
+        CachedTutorSummary,
+        BaseReferences<
+          _$AppDatabase,
+          $CachedTutorSummariesTable,
+          CachedTutorSummary
+        >,
+      ),
+      CachedTutorSummary,
+      PrefetchHooks Function()
+    >;
+typedef $$TutorDraftsTableCreateCompanionBuilder =
+    TutorDraftsCompanion Function({
+      required String conversationId,
+      required String draftText,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$TutorDraftsTableUpdateCompanionBuilder =
+    TutorDraftsCompanion Function({
+      Value<String> conversationId,
+      Value<String> draftText,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$TutorDraftsTableFilterComposer
+    extends Composer<_$AppDatabase, $TutorDraftsTable> {
+  $$TutorDraftsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get conversationId => $composableBuilder(
+    column: $table.conversationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get draftText => $composableBuilder(
+    column: $table.draftText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$TutorDraftsTableOrderingComposer
+    extends Composer<_$AppDatabase, $TutorDraftsTable> {
+  $$TutorDraftsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get conversationId => $composableBuilder(
+    column: $table.conversationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get draftText => $composableBuilder(
+    column: $table.draftText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TutorDraftsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TutorDraftsTable> {
+  $$TutorDraftsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get conversationId => $composableBuilder(
+    column: $table.conversationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get draftText =>
+      $composableBuilder(column: $table.draftText, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$TutorDraftsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TutorDraftsTable,
+          TutorDraft,
+          $$TutorDraftsTableFilterComposer,
+          $$TutorDraftsTableOrderingComposer,
+          $$TutorDraftsTableAnnotationComposer,
+          $$TutorDraftsTableCreateCompanionBuilder,
+          $$TutorDraftsTableUpdateCompanionBuilder,
+          (
+            TutorDraft,
+            BaseReferences<_$AppDatabase, $TutorDraftsTable, TutorDraft>,
+          ),
+          TutorDraft,
+          PrefetchHooks Function()
+        > {
+  $$TutorDraftsTableTableManager(_$AppDatabase db, $TutorDraftsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TutorDraftsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TutorDraftsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TutorDraftsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> conversationId = const Value.absent(),
+                Value<String> draftText = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TutorDraftsCompanion(
+                conversationId: conversationId,
+                draftText: draftText,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String conversationId,
+                required String draftText,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => TutorDraftsCompanion.insert(
+                conversationId: conversationId,
+                draftText: draftText,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$TutorDraftsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TutorDraftsTable,
+      TutorDraft,
+      $$TutorDraftsTableFilterComposer,
+      $$TutorDraftsTableOrderingComposer,
+      $$TutorDraftsTableAnnotationComposer,
+      $$TutorDraftsTableCreateCompanionBuilder,
+      $$TutorDraftsTableUpdateCompanionBuilder,
+      (
+        TutorDraft,
+        BaseReferences<_$AppDatabase, $TutorDraftsTable, TutorDraft>,
+      ),
+      TutorDraft,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4047,4 +6365,17 @@ class $AppDatabaseManager {
       $$PendingSyncOperationsTableTableManager(_db, _db.pendingSyncOperations);
   $$CacheMetadataTableTableManager get cacheMetadata =>
       $$CacheMetadataTableTableManager(_db, _db.cacheMetadata);
+  $$CachedTutorConversationsTableTableManager get cachedTutorConversations =>
+      $$CachedTutorConversationsTableTableManager(
+        _db,
+        _db.cachedTutorConversations,
+      );
+  $$CachedTutorMessagesTableTableManager get cachedTutorMessages =>
+      $$CachedTutorMessagesTableTableManager(_db, _db.cachedTutorMessages);
+  $$CachedTutorMistakesTableTableManager get cachedTutorMistakes =>
+      $$CachedTutorMistakesTableTableManager(_db, _db.cachedTutorMistakes);
+  $$CachedTutorSummariesTableTableManager get cachedTutorSummaries =>
+      $$CachedTutorSummariesTableTableManager(_db, _db.cachedTutorSummaries);
+  $$TutorDraftsTableTableManager get tutorDrafts =>
+      $$TutorDraftsTableTableManager(_db, _db.tutorDrafts);
 }

@@ -83,6 +83,52 @@ class CacheMetadata extends Table {
   Set<Column<Object>> get primaryKey => {key};
 }
 
+class CachedTutorConversations extends Table {
+  TextColumn get id => text()();
+  TextColumn get payload => text()();
+  DateTimeColumn get cachedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+class CachedTutorMessages extends Table {
+  TextColumn get id => text()();
+  TextColumn get conversationId => text()();
+  TextColumn get payload => text()();
+  DateTimeColumn get cachedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+class CachedTutorMistakes extends Table {
+  TextColumn get id => text()();
+  TextColumn get payload => text()();
+  DateTimeColumn get cachedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+class CachedTutorSummaries extends Table {
+  TextColumn get conversationId => text()();
+  TextColumn get payload => text()();
+  DateTimeColumn get cachedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {conversationId};
+}
+
+class TutorDrafts extends Table {
+  TextColumn get conversationId => text()();
+  TextColumn get draftText => text()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {conversationId};
+}
+
 @DriftDatabase(
   tables: [
     CachedCourses,
@@ -92,13 +138,32 @@ class CacheMetadata extends Table {
     LocalLessonProgress,
     PendingSyncOperations,
     CacheMetadata,
+    CachedTutorConversations,
+    CachedTutorMessages,
+    CachedTutorMistakes,
+    CachedTutorSummaries,
+    TutorDrafts,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(cachedTutorConversations);
+        await m.createTable(cachedTutorMessages);
+        await m.createTable(cachedTutorMistakes);
+        await m.createTable(cachedTutorSummaries);
+        await m.createTable(tutorDrafts);
+      }
+    },
+  );
 
   Future<void> cacheCourse(String id, String payload, int version) =>
       into(cachedCourses).insertOnConflictUpdate(
@@ -116,6 +181,28 @@ class AppDatabase extends _$AppDatabase {
   Future<List<PendingSyncOperation>> pendingOperations() => (select(
     pendingSyncOperations,
   )..where((row) => row.syncStatus.equals('pending'))).get();
+
+  Future<void> cacheTutorConversation(String id, String payload) =>
+      into(cachedTutorConversations).insertOnConflictUpdate(
+        CachedTutorConversationsCompanion.insert(
+          id: id,
+          payload: payload,
+          cachedAt: DateTime.now(),
+        ),
+      );
+
+  Future<void> cacheTutorMessage(
+    String id,
+    String conversationId,
+    String payload,
+  ) => into(cachedTutorMessages).insertOnConflictUpdate(
+    CachedTutorMessagesCompanion.insert(
+      id: id,
+      conversationId: conversationId,
+      payload: payload,
+      cachedAt: DateTime.now(),
+    ),
+  );
 }
 
 LazyDatabase _openConnection() {

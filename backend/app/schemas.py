@@ -29,6 +29,33 @@ Areas = Literal[
     "writing",
     "confidence",
 ]
+TutorMode = Literal[
+    "free_conversation",
+    "beginner_conversation",
+    "grammar_correction",
+    "sentence_improvement",
+    "ml_to_english",
+    "english_to_ml",
+    "guided_lesson",
+    "role_play",
+    "vocabulary_practice",
+    "writing_correction",
+]
+CorrectionMode = Literal["important", "major_only", "finish_first", "session_end"]
+MistakeCategory = Literal[
+    "tense",
+    "article",
+    "preposition",
+    "word_order",
+    "subject_verb_agreement",
+    "singular_plural",
+    "pronoun",
+    "vocabulary_choice",
+    "spelling",
+    "punctuation",
+    "unnatural_expression",
+    "no_significant_mistake",
+]
 
 
 class UserPublic(BaseModel):
@@ -297,3 +324,116 @@ class ProgressSyncRequest(BaseModel):
 class ProgressSyncResponse(BaseModel):
     processed: list[str]
     failed: list[dict[str, str]]
+
+
+class TutorConversationCreate(BaseModel):
+    mode: TutorMode
+    correction_mode: CorrectionMode = "important"
+
+
+class TutorConversationUpdate(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=160)
+    archived: bool | None = None
+    correction_mode: CorrectionMode | None = None
+
+
+class TutorConversationResponse(BaseModel):
+    id: str
+    mode: str
+    title: str
+    learner_level_snapshot: str
+    explanation_language_snapshot: str
+    correction_mode: str
+    status: str
+    created_at: datetime | None
+    updated_at: datetime | None
+    archived_at: datetime | None
+
+
+class TutorMessageRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=2000)
+    client_operation_id: str = Field(min_length=8, max_length=80)
+
+    @field_validator("text")
+    @classmethod
+    def meaningful_text(cls, value: str) -> str:
+        if not value.strip() or len(set(value.strip())) < 2:
+            raise ValueError("Please enter a meaningful learning message.")
+        return value.strip()
+
+
+class TutorResponsePayload(BaseModel):
+    reply_text: str
+    corrected_sentence: str | None = None
+    natural_alternative: str | None = None
+    mistake_detected: bool = False
+    mistake_category: MistakeCategory | None = None
+    explanation_en: str | None = None
+    explanation_ml: str | None = None
+    examples: list[str] = Field(default_factory=list, max_length=3)
+    encouragement: str | None = None
+    follow_up_question: str | None = None
+    vocabulary_items: list[str] = Field(default_factory=list, max_length=8)
+    safety_status: Literal["safe", "redirected"] = "safe"
+    provider_usage: dict[str, Any] = Field(default_factory=dict)
+
+
+class TutorMessageResponse(BaseModel):
+    id: str
+    conversation_id: str
+    role: str
+    original_learner_text: str | None
+    tutor_reply: str | None
+    structured_response: TutorResponsePayload | None
+    sequence_number: int
+    created_at: datetime | None
+    error_state: str | None
+
+
+class MistakeResponse(BaseModel):
+    id: str
+    original_sentence: str
+    corrected_sentence: str
+    natural_alternative: str | None
+    mistake_category: str
+    explanation_en: str
+    explanation_ml: str | None
+    examples: list[Any]
+    repeat_count: int
+    review_status: str
+    mastered: bool
+    mastered_at: datetime | None
+
+
+class MistakeUpdateRequest(BaseModel):
+    review_status: Literal["unreviewed", "reviewed"] | None = None
+    mastered: bool | None = None
+
+
+class TutorSummaryResponse(BaseModel):
+    conversation_id: str
+    message_count: int
+    learner_message_count: int
+    corrected_sentences: list[Any]
+    frequent_mistake_categories: list[Any]
+    new_vocabulary: list[Any]
+    strengths: list[Any]
+    improvement_areas: list[Any]
+    suggested_next_practice: str
+    session_duration_seconds: int
+    generated_at: datetime | None
+
+
+class TutorUsageResponse(BaseModel):
+    requests_today: int
+    tokens_today: int
+    daily_request_limit: int
+    daily_token_limit: int
+    provider_enabled: bool
+    provider: str
+
+
+class TutorModeResponse(BaseModel):
+    id: str
+    title: str
+    description: str

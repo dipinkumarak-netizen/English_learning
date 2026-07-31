@@ -11,6 +11,8 @@
 - Future AI endpoints require quotas for technical cost safety, request limits, input validation, prompt-injection resistance, provider timeouts, and safe logging. These are not paid-plan restrictions.
 - Course answer keys are not included in online lesson responses. The backend scores online attempts deterministically. Offline cached content may contain validated scoring data for immediate feedback; synced attempts are revalidated by the backend.
 - Progress APIs enforce user ownership, published-content visibility, stable client operation IDs, duplicate protection, and server-side completion rules. Server-completed progress cannot be downgraded by stale local data.
+- Tutor conversations, messages, corrections, mistakes, summaries, and usage records are ownership-scoped. Conversation deletion is hard deletion with cascading related records. Provider keys remain backend-only environment values.
+- AI output is untrusted text: structured schemas validate it, safety redirects run before generation, prompt-injection requests are refused, and Flutter never executes model output.
 - Audio will later require consent, MIME/size/duration limits, short retention, and deletion. Raw voice will not be retained by default.
 - Subscription, payment, billing, entitlement, trial, and promotional-access systems are permanently removed from the private-use scope.
 - Application UI language is English-only. Malayalam learning explanations are domain content and are not loaded through the application-locale system.

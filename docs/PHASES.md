@@ -21,4 +21,6 @@ Language scope update: the application interface is English-only. Malayalam rema
 
 Phase 3 will add original data-driven beginner course content, lesson delivery, exercise rendering, lesson progress, and basic offline lesson caching. It will not add AI tutor, voice, pronunciation, payments, or commercial features.
 
-Phase 3 is complete within the validated local scope: the backend course engine, original seeded curriculum, deterministic exercises, authenticated progress APIs, Drift cache, queued sync service, lesson library/player screens, and auth refresh retry are implemented. Phase 4 remains text AI tutor work and has not started.
+Phase 3 is complete within the validated local scope: the backend course engine, original seeded curriculum, deterministic exercises, authenticated progress APIs, Drift cache, queued sync service, lesson library/player screens, and auth refresh retry are implemented.
+
+Phase 4 is complete within the validated local scope: backend provider abstraction with a deterministic mock, structured text tutor conversations, correction/mistake notebook, summaries, usage controls, safety/prompt foundations, Flutter chat/notebook screens, and offline display cache. Phase 5 remains voice conversation and has not started.

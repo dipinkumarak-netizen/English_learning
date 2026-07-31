@@ -25,6 +25,17 @@ services:
       DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://nilaspeak:change-me-local@db:5432/nilaspeak}
       BACKEND_CORS_ORIGINS: ${BACKEND_CORS_ORIGINS:-http://localhost:3000,http://localhost:8080}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      AI_PROVIDER: ${AI_PROVIDER:-none}
+      AI_MODEL: ${AI_MODEL:-mock-tutor-v1}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_BASE_URL: ${AI_BASE_URL:-}
+      AI_REQUEST_TIMEOUT_SECONDS: ${AI_REQUEST_TIMEOUT_SECONDS:-20}
+      AI_MAX_OUTPUT_TOKENS: ${AI_MAX_OUTPUT_TOKENS:-400}
+      AI_DAILY_REQUEST_LIMIT: ${AI_DAILY_REQUEST_LIMIT:-50}
+      AI_DAILY_TOKEN_LIMIT: ${AI_DAILY_TOKEN_LIMIT:-12000}
+      AI_MAX_MESSAGE_CHARACTERS: ${AI_MAX_MESSAGE_CHARACTERS:-2000}
+      AI_CONVERSATION_CONTEXT_LIMIT: ${AI_CONVERSATION_CONTEXT_LIMIT:-12}
+      AI_PROVIDER_ENABLED: ${AI_PROVIDER_ENABLED:-false}
     depends_on:
       db:
         condition: service_healthy

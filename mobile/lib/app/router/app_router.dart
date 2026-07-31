@@ -16,6 +16,9 @@ import '../../features/courses/presentation/course_details_screen.dart';
 import '../../features/courses/presentation/course_library_screen.dart';
 import '../../features/courses/presentation/lesson_player_screen.dart';
 import '../../features/courses/presentation/progress_summary_screen.dart';
+import '../../features/tutor/presentation/mistake_notebook_screen.dart';
+import '../../features/tutor/presentation/tutor_chat_screen.dart';
+import '../../features/tutor/presentation/tutor_home_screen.dart';
 import 'route_names.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -78,6 +81,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/progress',
         builder: (_, _) => const ProgressSummaryScreen(),
+      ),
+      GoRoute(path: '/tutor', builder: (_, _) => const TutorHomeScreen()),
+      GoRoute(
+        path: '/tutor/chat/:conversationId',
+        builder: (_, state) => TutorChatScreen(
+          conversationId: state.pathParameters['conversationId']!,
+        ),
+      ),
+      GoRoute(
+        path: '/tutor/mistakes',
+        builder: (_, _) => const MistakeNotebookScreen(),
       ),
     ],
   );

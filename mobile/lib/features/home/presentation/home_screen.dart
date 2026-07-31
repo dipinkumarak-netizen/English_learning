@@ -41,6 +41,17 @@ class HomeScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           Card(
             child: ListTile(
+              leading: const Icon(Icons.forum_outlined),
+              title: const Text('AI English tutor'),
+              subtitle: const Text(
+                'Practise with secure text-only learning support.',
+              ),
+              onTap: () => context.go('/tutor'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
               leading: const Icon(Icons.insights_outlined),
               title: const Text('Progress summary'),
               subtitle: const Text(

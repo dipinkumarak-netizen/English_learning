@@ -384,3 +384,153 @@ class OfflineSyncOperation(Base):
     retry_count: Mapped[int] = mapped_column(Integer, default=0)
     last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
     sync_status: Mapped[str] = mapped_column(String(20), default="pending")
+
+
+class TutorConversation(TimestampMixin, Base):
+    __tablename__ = "tutor_conversations"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    mode: Mapped[str] = mapped_column(String(40))
+    title: Mapped[str] = mapped_column(String(160), default="English practice")
+    learner_level_snapshot: Mapped[str] = mapped_column(String(10), default="A1")
+    explanation_language_snapshot: Mapped[str] = mapped_column(String(10), default="en")
+    correction_mode: Mapped[str] = mapped_column(String(40), default="important")
+    status: Mapped[str] = mapped_column(String(20), default="active", index=True)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class TutorMessage(Base):
+    __tablename__ = "tutor_messages"
+    __table_args__ = (UniqueConstraint("conversation_id", "sequence_number"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    conversation_id: Mapped[str] = mapped_column(
+        ForeignKey("tutor_conversations.id", ondelete="CASCADE"), index=True
+    )
+    client_operation_id: Mapped[str | None] = mapped_column(String(80), unique=True, nullable=True)
+    role: Mapped[str] = mapped_column(String(20))
+    original_learner_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    tutor_reply: Mapped[str | None] = mapped_column(Text, nullable=True)
+    structured_response: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    provider: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    model: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    input_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    output_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    sequence_number: Mapped[int] = mapped_column(Integer)
+    error_state: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class TutorSessionPreference(Base):
+    __tablename__ = "tutor_session_preferences"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    conversation_id: Mapped[str] = mapped_column(
+        ForeignKey("tutor_conversations.id", ondelete="CASCADE"), unique=True
+    )
+    correction_mode: Mapped[str] = mapped_column(String(40))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class TutorCorrection(Base):
+    __tablename__ = "tutor_corrections"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    conversation_id: Mapped[str] = mapped_column(
+        ForeignKey("tutor_conversations.id", ondelete="CASCADE"), index=True
+    )
+    message_id: Mapped[str] = mapped_column(
+        ForeignKey("tutor_messages.id", ondelete="CASCADE"), index=True
+    )
+    original_sentence: Mapped[str] = mapped_column(Text)
+    corrected_sentence: Mapped[str] = mapped_column(Text)
+    natural_alternative: Mapped[str | None] = mapped_column(Text, nullable=True)
+    mistake_category: Mapped[str] = mapped_column(String(40), index=True)
+    explanation_en: Mapped[str] = mapped_column(Text)
+    explanation_ml: Mapped[str | None] = mapped_column(Text, nullable=True)
+    examples: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class MistakeNotebookEntry(Base):
+    __tablename__ = "mistake_notebook_entries"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    correction_id: Mapped[str] = mapped_column(
+        ForeignKey("tutor_corrections.id", ondelete="CASCADE"), index=True
+    )
+    original_sentence: Mapped[str] = mapped_column(Text)
+    corrected_sentence: Mapped[str] = mapped_column(Text)
+    natural_alternative: Mapped[str | None] = mapped_column(Text, nullable=True)
+    mistake_category: Mapped[str] = mapped_column(String(40), index=True)
+    explanation_en: Mapped[str] = mapped_column(Text)
+    explanation_ml: Mapped[str | None] = mapped_column(Text, nullable=True)
+    examples: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    first_seen_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    last_seen_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    repeat_count: Mapped[int] = mapped_column(Integer, default=1)
+    review_status: Mapped[str] = mapped_column(String(20), default="unreviewed")
+    mastered: Mapped[bool] = mapped_column(Boolean, default=False)
+    mastered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class TutorSessionSummary(Base):
+    __tablename__ = "tutor_session_summaries"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    conversation_id: Mapped[str] = mapped_column(
+        ForeignKey("tutor_conversations.id", ondelete="CASCADE"), unique=True
+    )
+    message_count: Mapped[int] = mapped_column(Integer)
+    learner_message_count: Mapped[int] = mapped_column(Integer)
+    corrected_sentences: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    frequent_mistake_categories: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    new_vocabulary: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    strengths: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    improvement_areas: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    suggested_next_practice: Mapped[str] = mapped_column(Text)
+    session_duration_seconds: Mapped[int] = mapped_column(Integer, default=0)
+    generated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class AIUsageRecord(Base):
+    __tablename__ = "ai_usage_records"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    conversation_id: Mapped[str | None] = mapped_column(
+        ForeignKey("tutor_conversations.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    provider: Mapped[str] = mapped_column(String(40))
+    model: Mapped[str] = mapped_column(String(100))
+    request_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
+    input_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    output_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    total_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    request_status: Mapped[str] = mapped_column(String(30))
+    latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    estimated_cost: Mapped[float | None] = mapped_column(nullable=True)
+    failure_category: Mapped[str | None] = mapped_column(String(40), nullable=True)
+
+
+class PromptTemplateVersion(Base):
+    __tablename__ = "prompt_template_versions"
+    __table_args__ = (UniqueConstraint("task", "version"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    task: Mapped[str] = mapped_column(String(50), index=True)
+    version: Mapped[int] = mapped_column(Integer)
+    template_text: Mapped[str] = mapped_column(Text)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

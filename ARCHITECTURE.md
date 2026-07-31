@@ -8,7 +8,7 @@ Riverpod provides dependency injection and state. GoRouter owns navigation and a
 
 ## Backend
 
-FastAPI exposes versioned routes. Pydantic validates request/response schemas. SQLAlchemy 2 async and Alembic provide the PostgreSQL foundation. Phase 2 uses Argon2 password hashes, short-lived JWT access tokens, hashed opaque refresh sessions with rotation/revocation, and ownership-scoped private resources. Phase 3 adds Course → Module → Lesson → LessonStep → ExerciseDefinition, learner progress, attempts, and a narrow idempotent sync queue. Redis is deferred.
+FastAPI exposes versioned routes. Pydantic validates request/response schemas. SQLAlchemy 2 async and Alembic provide the PostgreSQL foundation. Phase 2 uses Argon2 password hashes, short-lived JWT access tokens, hashed opaque refresh sessions with rotation/revocation, and ownership-scoped private resources. Phase 3 adds Course → Module → Lesson → LessonStep → ExerciseDefinition, learner progress, attempts, and a narrow idempotent sync queue. Phase 4 adds ownership-scoped tutor conversations, structured corrections, usage accounting, and a backend-only provider boundary. Redis is deferred.
 
 ## Data flow
 
@@ -16,7 +16,7 @@ Flutter → API client → versioned FastAPI route → database/domain service. 
 
 ## Local persistence
 
-Secure storage holds access and refresh tokens. SharedPreferences holds only a resumable onboarding draft; no application-language preference is stored. Drift stores versioned course cache, lesson progress, and pending sync operations. The backend is authoritative for published curriculum and final synced progress; local data is authoritative only for unsynced offline work.
+Secure storage holds access and refresh tokens. SharedPreferences holds only a resumable onboarding draft; no application-language preference is stored. Drift stores versioned course cache, lesson progress, pending sync operations, and tutor display caches/drafts. The backend is authoritative for published curriculum, final synced progress, conversations, tutor responses, mistakes, and usage; local data is authoritative only for display cache and explicit unsent drafts.
 
 ## Testing
 

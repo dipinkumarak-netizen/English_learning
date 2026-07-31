@@ -13,6 +13,17 @@ class Settings(BaseSettings):
     jwt_secret: str = "local-development-secret-change-before-remote-use"
     access_token_minutes: int = 15
     refresh_token_days: int = 30
+    ai_provider: str = "none"
+    ai_model: str = "mock-tutor-v1"
+    ai_api_key: str = ""
+    ai_base_url: str = ""
+    ai_request_timeout_seconds: int = 20
+    ai_max_output_tokens: int = 400
+    ai_daily_request_limit: int = 50
+    ai_daily_token_limit: int = 12000
+    ai_max_message_characters: int = 2000
+    ai_conversation_context_limit: int = 12
+    ai_provider_enabled: bool = False
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
 
