@@ -460,6 +460,52 @@ class TutorUsageResponse(BaseModel):
     provider: str
 
 
+ProviderCapability = Literal["ai", "stt", "tts"]
+ProviderName = Literal["none", "mock", "openai"]
+ProviderTestStatus = Literal["success", "failed"]
+
+
+class ProviderSettingsUpdate(BaseModel):
+    provider: ProviderName
+    api_key: str | None = Field(default=None, min_length=1, max_length=500)
+    model: str | None = Field(default=None, max_length=160)
+    base_url: str | None = Field(default=None, max_length=240)
+    voice: str | None = Field(default=None, max_length=40)
+    enabled: bool = False
+
+
+class ProviderSettingsSummary(BaseModel):
+    capability: ProviderCapability
+    provider: str
+    configured: bool
+    key_last4: str | None
+    model: str | None
+    base_url: str | None
+    voice: str | None
+    enabled: bool
+    last_test_status: str | None
+    last_tested_at: datetime | None
+    updated_at: datetime | None
+
+
+class ProviderSettingsResponse(BaseModel):
+    providers: list[ProviderSettingsSummary]
+
+
+class ProviderTestRequest(BaseModel):
+    provider: ProviderName
+    api_key: str | None = Field(default=None, min_length=1, max_length=500)
+    model: str | None = Field(default=None, max_length=160)
+    base_url: str | None = Field(default=None, max_length=240)
+    voice: str | None = Field(default=None, max_length=40)
+
+
+class ProviderTestResponse(BaseModel):
+    status: ProviderTestStatus
+    message: str
+    tested_at: datetime
+
+
 class TutorModeResponse(BaseModel):
     id: str
     title: str

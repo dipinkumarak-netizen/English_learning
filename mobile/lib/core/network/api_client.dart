@@ -112,9 +112,16 @@ final class ApiClient {
     }
   }
 
-  Future<void> delete(String path, {String? accessToken}) async {
+  Future<Map<String, dynamic>> delete(
+    String path, {
+    String? accessToken,
+  }) async {
     try {
-      await _dio.delete<void>(path, options: _options(accessToken));
+      final response = await _dio.delete<Map<String, dynamic>>(
+        path,
+        options: _options(accessToken),
+      );
+      return response.data ?? <String, dynamic>{};
     } catch (error, stackTrace) {
       final mapped = mapDioError(error);
       AppLogger.instance.error('API delete failed', mapped, stackTrace);

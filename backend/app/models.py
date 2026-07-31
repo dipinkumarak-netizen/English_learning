@@ -657,3 +657,36 @@ class PromptTemplateVersion(Base):
     template_text: Mapped[str] = mapped_column(Text)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ProviderCredential(Base):
+    __tablename__ = "provider_credentials"
+    __table_args__ = (UniqueConstraint("user_id", "capability"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    capability: Mapped[str] = mapped_column(String(10))
+    provider: Mapped[str] = mapped_column(String(40), default="none")
+    encrypted_api_key: Mapped[str | None] = mapped_column(Text, nullable=True)
+    key_last4: Mapped[str | None] = mapped_column(String(4), nullable=True)
+    model: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    base_url: Mapped[str | None] = mapped_column(String(240), nullable=True)
+    voice: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    last_test_status: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    last_tested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
+class ProviderCredentialAudit(Base):
+    __tablename__ = "provider_credential_audits"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    capability: Mapped[str] = mapped_column(String(10))
+    action: Mapped[str] = mapped_column(String(30))
+    outcome: Mapped[str] = mapped_column(String(20))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

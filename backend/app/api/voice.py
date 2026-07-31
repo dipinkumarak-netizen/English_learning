@@ -23,6 +23,7 @@ from app.models import (
     VoiceTurn,
     VoiceUsageRecord,
 )
+from app.provider_credentials import build_user_provider
 from app.schemas import (
     TutorMessageRequest,
     VoicePreferenceUpdate,
@@ -38,8 +39,6 @@ from app.voice.providers import (
     VoiceProviderRateLimited,
     VoiceProviderTimeout,
     VoiceProviderUnavailable,
-    build_stt_provider,
-    build_tts_provider,
 )
 
 router = APIRouter(prefix="/voice", tags=["voice"])
@@ -314,7 +313,7 @@ async def transcribe(
     if _storage_root() not in path.parents:
         raise HTTPException(status_code=400, detail="Audio reference is invalid.")
     try:
-        provider = build_stt_provider(get_settings())
+        provider = await build_user_provider("stt", user, db, get_settings())
         result = await provider.transcribe(
             SpeechToTextRequest(
                 audio_bytes=path.read_bytes(),
@@ -443,7 +442,7 @@ async def synthesise(
     ):
         raise HTTPException(status_code=429, detail="Daily tutor-audio safety limit reached.")
     try:
-        provider = build_tts_provider(get_settings())
+        provider = await build_user_provider("tts", user, db, get_settings())
         result = await provider.synthesise(
             TextToSpeechRequest(
                 text=text,

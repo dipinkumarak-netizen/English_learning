@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     allow_registration: bool = True
     jwt_secret: str = "local-development-secret-change-before-remote-use"
+    credential_encryption_key: str = ""
+    credential_encryption_previous_key: str = ""
+    provider_allowed_base_urls: str = "https://api.openai.com/v1"
+    provider_allow_local_urls: bool = False
+    provider_settings_rate_limit_per_hour: int = 10
     access_token_minutes: int = 15
     refresh_token_days: int = 30
     ai_provider: str = "none"

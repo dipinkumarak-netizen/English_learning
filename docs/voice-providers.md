@@ -2,6 +2,10 @@
 
 Provider keys stay in the backend runtime environment and are never sent to Flutter.
 
+For secure per-account credentials, set `CREDENTIAL_ENCRYPTION_KEY` to a
+URL-safe base64-encoded 32-byte random value. Keep it outside Git. Losing this
+key makes stored credentials unrecoverable.
+
 Disabled:
 
 ```env

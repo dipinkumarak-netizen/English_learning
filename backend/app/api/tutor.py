@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai.providers import ProviderMalformed, ProviderRequest, ProviderUnavailable, build_provider
+from app.ai.providers import ProviderMalformed, ProviderRequest, ProviderUnavailable
 from app.ai.safety import safety_redirect
 from app.core.config import get_settings
 from app.db.session import get_db
@@ -21,6 +21,7 @@ from app.models import (
     TutorSessionSummary,
     User,
 )
+from app.provider_credentials import build_user_provider
 from app.schemas import (
     MistakeResponse,
     MistakeUpdateRequest,
@@ -306,7 +307,7 @@ async def send_message(
     db.add(learner_message)
     await db.flush()
     safety = safety_redirect(payload.text)
-    provider = build_provider(settings)
+    provider = await build_user_provider("ai", user, db, settings)
     started = datetime.now(UTC)
     response: TutorResponsePayload
     provider_name = provider.name
