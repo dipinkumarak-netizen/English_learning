@@ -62,9 +62,10 @@ class VoiceRepository {
   Future<Map<String, dynamic>> transcribe(
     String turnId,
     String operationId,
-  ) async => _client.get(
+  ) async => _client.post(
     '/api/v1/voice/turns/$turnId/transcribe?operation_id=$operationId',
     accessToken: await _token(),
+    data: const <String, dynamic>{},
   );
 
   Future<Map<String, dynamic>> editTranscript(
