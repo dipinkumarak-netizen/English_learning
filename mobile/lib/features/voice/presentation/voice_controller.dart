@@ -261,11 +261,21 @@ class VoiceController extends ChangeNotifier {
       );
       tutorAudioId = response['audio_id'] as String?;
       if (tutorAudioId == null) throw StateError('No audio returned');
-      final bytes = await _repository.audio(tutorAudioId!);
+      final audio = await _repository.audio(tutorAudioId!);
+      if (audio.bytes.isEmpty) {
+        throw StateError('Tutor audio download was empty');
+      }
+      final extension = audioFileExtension(audio.contentType);
+      if (extension == null) {
+        throw StateError('Tutor audio format is not supported.');
+      }
       final directory = await getTemporaryDirectory();
       final path =
-          '${directory.path}${Platform.pathSeparator}nilaspeak-tutor.wav';
-      await File(path).writeAsBytes(bytes, flush: true);
+          '${directory.path}${Platform.pathSeparator}nilaspeak-tutor$extension';
+      await File(path).writeAsBytes(audio.bytes, flush: true);
+      if (!File(path).existsSync() || File(path).lengthSync() == 0) {
+        throw StateError('Tutor audio could not be cached locally.');
+      }
       await _player.setFilePath(path);
       duration = _player.duration ?? Duration.zero;
       state = VoiceState.completed;

@@ -95,7 +95,9 @@ class VoiceRepository {
     data: {'client_operation_id': operationId, 'text_kind': 'reply'},
   );
 
-  Future<List<int>> audio(String audioId) async => _client.downloadBytes(
+  Future<({List<int> bytes, String? contentType})> audio(
+    String audioId,
+  ) async => _client.downloadAudio(
     '/api/v1/voice/audio/$audioId',
     accessToken: await _token(),
   );

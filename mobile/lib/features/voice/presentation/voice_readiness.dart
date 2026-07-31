@@ -40,3 +40,12 @@ const recordingConfigurationFallbacks = <String>[
 
 String recorderFailureMessage(Object error) =>
     'Recorder could not start: $error. Use text tutor or try again.';
+
+String? audioFileExtension(String? contentType) =>
+    switch (contentType?.split(';').first.trim().toLowerCase()) {
+      'audio/mpeg' || 'audio/mp3' => '.mp3',
+      'audio/wav' || 'audio/wave' => '.wav',
+      'audio/ogg' => '.ogg',
+      'audio/opus' => '.opus',
+      _ => null,
+    };

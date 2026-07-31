@@ -86,6 +86,14 @@ final class ApiClient {
   );
 
   Future<List<int>> downloadBytes(String path, {String? accessToken}) async {
+    final response = await downloadAudio(path, accessToken: accessToken);
+    return response.bytes;
+  }
+
+  Future<({List<int> bytes, String? contentType})> downloadAudio(
+    String path, {
+    String? accessToken,
+  }) async {
     try {
       final response = await _dio.get<List<int>>(
         path,
@@ -93,7 +101,10 @@ final class ApiClient {
           accessToken,
         ).copyWith(responseType: ResponseType.bytes),
       );
-      return response.data ?? const <int>[];
+      return (
+        bytes: response.data ?? const <int>[],
+        contentType: response.headers.value(Headers.contentTypeHeader),
+      );
     } catch (error, stackTrace) {
       final mapped = mapDioError(error);
       AppLogger.instance.error('API download failed', mapped, stackTrace);

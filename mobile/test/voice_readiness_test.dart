@@ -56,4 +56,10 @@ void main() {
       contains('encoder unavailable'),
     );
   });
+
+  test('audio playback selects an extension from the server MIME type', () {
+    expect(audioFileExtension('audio/mpeg; charset=binary'), '.mp3');
+    expect(audioFileExtension('audio/wav'), '.wav');
+    expect(audioFileExtension('application/octet-stream'), isNull);
+  });
 }

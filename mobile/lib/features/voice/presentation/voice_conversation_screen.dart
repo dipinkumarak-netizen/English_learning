@@ -247,7 +247,11 @@ class _TutorResponse extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onSynthesis,
                 icon: const Icon(Icons.volume_up),
-                label: const Text('Create tutor audio'),
+                label: Text(
+                  controller.state == VoiceState.failed
+                      ? 'Retry voice'
+                      : 'Create tutor audio',
+                ),
               )
             else
               Wrap(

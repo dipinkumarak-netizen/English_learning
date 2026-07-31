@@ -35,6 +35,7 @@ from app.voice.providers import (
     SpeechToTextRequest,
     TextToSpeechRequest,
     VoiceProviderMalformed,
+    VoiceProviderRateLimited,
     VoiceProviderTimeout,
     VoiceProviderUnavailable,
     build_stt_provider,
@@ -327,6 +328,11 @@ async def transcribe(
         turn.failure_category = "timeout"
         await db.commit()
         raise HTTPException(status_code=504, detail=str(error)) from error
+    except VoiceProviderRateLimited as error:
+        turn.transcription_status = "failed"
+        turn.failure_category = "provider_rate_limit"
+        await db.commit()
+        raise HTTPException(status_code=429, detail=str(error)) from error
     except (VoiceProviderUnavailable, VoiceProviderMalformed) as error:
         turn.transcription_status = "failed"
         turn.failure_category = "provider"
@@ -439,24 +445,41 @@ async def synthesise(
     try:
         provider = build_tts_provider(get_settings())
         result = await provider.synthesise(
-            TextToSpeechRequest(text=text, voice="default", speed=1.0)
+            TextToSpeechRequest(
+                text=text,
+                voice=get_settings().tts_voice,
+                speed=1.0,
+            )
         )
     except VoiceProviderTimeout as error:
         turn.synthesis_status = "failed"
         turn.failure_category = "timeout"
         await db.commit()
         raise HTTPException(status_code=504, detail=str(error)) from error
+    except VoiceProviderRateLimited as error:
+        turn.synthesis_status = "failed"
+        turn.failure_category = "provider_rate_limit"
+        await db.commit()
+        raise HTTPException(status_code=429, detail=str(error)) from error
     except (VoiceProviderUnavailable, VoiceProviderMalformed) as error:
         turn.synthesis_status = "failed"
         turn.failure_category = "provider"
         await db.commit()
         raise HTTPException(status_code=503, detail=str(error)) from error
+    extension = {
+        "audio/mpeg": ".mp3",
+        "audio/mp3": ".mp3",
+        "audio/wav": ".wav",
+        "audio/wave": ".wav",
+        "audio/ogg": ".ogg",
+        "audio/opus": ".opus",
+    }.get(result.mime_type, ".audio")
     asset = AudioAsset(
         user_id=user.id,
         session_id=turn.session_id,
         turn_id=turn.id,
         asset_type="tutor",
-        storage_key=f"tutor/{secrets.token_urlsafe(24)}.wav",
+        storage_key=f"tutor/{secrets.token_urlsafe(24)}{extension}",
         mime_type=result.mime_type,
         byte_size=len(result.audio_bytes),
         duration_seconds=result.duration_seconds,
@@ -516,7 +539,11 @@ async def get_audio(
     path = (_storage_root() / asset.storage_key).resolve()
     if _storage_root() not in path.parents or not path.is_file():
         raise HTTPException(status_code=404, detail="Audio is no longer available.")
-    return FileResponse(path, media_type=asset.mime_type, filename="tutor-audio.wav")
+    return FileResponse(
+        path,
+        media_type=asset.mime_type,
+        filename=Path(asset.storage_key).name,
+    )
 
 
 @router.post("/sessions/{session_id}/complete")
