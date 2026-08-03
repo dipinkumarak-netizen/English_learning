@@ -105,7 +105,8 @@ class ProviderSettingsController extends ChangeNotifier {
         'voice': voice,
         'base_url': null,
       });
-      testMessage = response['message'] as String? ?? 'Connection test complete.';
+      testMessage =
+          response['message'] as String? ?? 'Connection test complete.';
       return response['status'] == 'success';
     } catch (exception) {
       testMessage = _safeMessage(exception);

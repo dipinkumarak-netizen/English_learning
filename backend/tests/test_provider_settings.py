@@ -1,13 +1,13 @@
-import base64
 import asyncio
+import base64
 import os
 
 import pytest
+from conftest import test_session_factory
 from sqlalchemy import select
 
 from app.models import ProviderCredential
 from app.provider_crypto import decrypt_credential, encrypt_credential
-from conftest import test_session_factory
 
 
 def register(client, email: str) -> dict:
@@ -25,9 +25,9 @@ def headers(auth: dict) -> dict[str, str]:
 
 def test_encryption_is_authenticated_and_round_trips() -> None:
     encoded = base64.urlsafe_b64encode(os.urandom(32)).decode()
-    ciphertext = encrypt_credential("secret-provider-key", encoded)
-    assert "secret-provider-key" not in ciphertext
-    assert decrypt_credential(ciphertext, encoded) == "secret-provider-key"
+    ciphertext = encrypt_credential("fixture-value-1234", encoded)
+    assert "fixture-value-1234" not in ciphertext
+    assert decrypt_credential(ciphertext, encoded) == "fixture-value-1234"
     with pytest.raises(Exception):
         decrypt_credential(ciphertext[:-1] + "A", encoded)
 
@@ -44,7 +44,7 @@ def test_provider_key_is_encrypted_and_never_returned(client, monkeypatch) -> No
         headers=headers(auth),
         json={
             "provider": "openai",
-            "api_key": "secret-provider-key-1234",
+            "api_key": "fixture-value-1234",
             "model": "gpt-test",
             "enabled": True,
         },
@@ -52,7 +52,7 @@ def test_provider_key_is_encrypted_and_never_returned(client, monkeypatch) -> No
     assert response.status_code == 200
     body = response.json()
     assert body["providers"][0]["key_last4"] == "1234"
-    assert "secret-provider-key-1234" not in response.text
+    assert "fixture-value-1234" not in response.text
     assert "encrypted_api_key" not in response.text
 
     async def read_credential() -> ProviderCredential:
@@ -60,8 +60,8 @@ def test_provider_key_is_encrypted_and_never_returned(client, monkeypatch) -> No
             return await session.scalar(select(ProviderCredential))
 
     credential = asyncio.run(read_credential())
-    assert credential.encrypted_api_key != "secret-provider-key-1234"
-    assert decrypt_credential(credential.encrypted_api_key, encoded) == "secret-provider-key-1234"
+    assert credential.encrypted_api_key != "fixture-value-1234"
+    assert decrypt_credential(credential.encrypted_api_key, encoded) == "fixture-value-1234"
 
 
 def test_provider_settings_are_owned_and_deleteable(client, monkeypatch) -> None:

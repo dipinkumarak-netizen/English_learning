@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../../core/errors/app_error.dart';
 import 'auth_controller.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
@@ -110,11 +111,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           .read(authStateProvider.notifier)
           .signUp(_email.text.trim(), _password.text, _name.text.trim());
       if (mounted) context.go('/migration');
-    } catch (_) {
+    } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.genericError)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error is AppError ? error.message : l10n.genericError,
+            ),
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _busy = false);

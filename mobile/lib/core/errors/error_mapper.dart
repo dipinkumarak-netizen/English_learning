@@ -3,11 +3,32 @@ import 'package:dio/dio.dart';
 import 'app_error.dart';
 
 AppError mapDioError(Object error) {
-  if (error is DioException && error.type == DioExceptionType.connectionError) {
-    return const OfflineError('No network connection.');
-  }
   if (error is DioException) {
-    return NetworkError(error.message ?? 'Network request failed.');
+    final status = error.response?.statusCode;
+    if (error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioExceptionType.receiveTimeout ||
+        error.type == DioExceptionType.sendTimeout) {
+      return const OfflineError('The backend connection timed out.');
+    }
+    if (error.type == DioExceptionType.connectionError) {
+      return const OfflineError('The backend is unreachable.');
+    }
+    if (status == 403 && error.requestOptions.path.endsWith('/auth/register')) {
+      return const NetworkError('Registration is currently disabled.');
+    }
+    final message = status == null
+        ? 'The backend request failed.'
+        : switch (status) {
+            401 => 'Your session expired. Continuing in local mode.',
+            403 => 'This action is not allowed.',
+            409 =>
+              'The account already exists or conflicts with existing data.',
+            422 => 'The server rejected the submitted details.',
+            429 => 'Too many requests. Please try again later.',
+            >= 500 => 'The backend is temporarily unavailable.',
+            _ => 'The backend request failed.',
+          };
+    return NetworkError(message);
   }
-  return UnknownAppError(error.toString());
+  return const UnknownAppError('Unexpected application error.');
 }

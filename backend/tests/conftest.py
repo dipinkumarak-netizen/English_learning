@@ -1,10 +1,14 @@
 import asyncio
+import os
+import secrets
 from collections.abc import AsyncGenerator, Generator
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+os.environ.setdefault("JWT_SECRET", secrets.token_urlsafe(48))
 
 from app.core.config import get_settings
 from app.db.base import Base

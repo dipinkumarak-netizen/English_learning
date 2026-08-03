@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../features/authentication/data/token_storage.dart';
 import '../config/app_config.dart';
@@ -12,7 +13,9 @@ final class ApiClient {
           dio ??
           Dio(
             BaseOptions(
-              baseUrl: AppConfig.apiBaseUrl,
+              baseUrl: AppConfig.apiBaseUrl.isEmpty
+                  ? 'http://127.0.0.1:9'
+                  : AppConfig.apiBaseUrl,
               connectTimeout: const Duration(seconds: 5),
               receiveTimeout: const Duration(seconds: 10),
               headers: {'Accept': 'application/json'},
@@ -20,11 +23,43 @@ final class ApiClient {
           ),
       // The Dio initializer requires a separate initializer-list entry.
       // ignore: prefer_initializing_formals
-      _tokens = tokens;
+      _tokens = tokens {
+    if (kDebugMode) {
+      _dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            options.extra['_nilaspeak_started'] = DateTime.now();
+            options.headers['X-Request-ID'] =
+                'mobile-${DateTime.now().microsecondsSinceEpoch}';
+            handler.next(options);
+          },
+          onResponse: (response, handler) {
+            _logDiagnostic(response.requestOptions, response.statusCode);
+            handler.next(response);
+          },
+          onError: (error, handler) {
+            _logDiagnostic(error.requestOptions, error.response?.statusCode);
+            handler.next(error);
+          },
+        ),
+      );
+    }
+  }
 
   final Dio _dio;
   final TokenStorage? _tokens;
   Future<bool>? _refreshing;
+
+  void _logDiagnostic(RequestOptions options, int? status) {
+    if (!kDebugMode) return;
+    final started = options.extra['_nilaspeak_started'];
+    final duration = started is DateTime
+        ? DateTime.now().difference(started).inMilliseconds
+        : -1;
+    AppLogger.instance.network(
+      '${options.method} ${options.path} ${status ?? 'error'} ${duration}ms',
+    );
+  }
 
   Future<Map<String, dynamic>> get(String path, {String? accessToken}) =>
       _request(
@@ -178,7 +213,10 @@ final class ApiClient {
     final tokens = _tokens;
     if (tokens == null) return false;
     final refreshToken = await tokens.readRefreshToken();
-    if (refreshToken == null) return false;
+    if (refreshToken == null) {
+      await tokens.clear();
+      return false;
+    }
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         '/api/v1/auth/refresh',

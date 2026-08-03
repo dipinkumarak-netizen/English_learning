@@ -1,3 +1,4 @@
 abstract final class ApiEndpoints {
-  static const health = '/api/v1/health';
+  static const health = '/health';
+  static const readiness = '/ready';
 }

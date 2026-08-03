@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'voice_controller.dart';
 import 'voice_providers.dart';
 import 'voice_state_machine.dart';
+import '../../settings/presentation/provider_settings_providers.dart';
 
 class VoiceConversationScreen extends ConsumerStatefulWidget {
   const VoiceConversationScreen({required this.sessionId, super.key});
@@ -29,6 +30,7 @@ class _VoiceConversationScreenState
   Widget build(BuildContext context) {
     final controller = ref.watch(voiceControllerProvider(widget.sessionId));
     final notifier = ref.read(voiceControllerProvider(widget.sessionId));
+    final providerSettings = ref.watch(providerSettingsProvider);
     if (controller.editedTranscript != null &&
         _transcriptController.text != controller.editedTranscript) {
       _transcriptController.text = controller.editedTranscript!;
@@ -75,6 +77,9 @@ class _VoiceConversationScreenState
                 ),
               ),
             if (_privacyAccepted) ...[
+              if (providerSettings.providers.isNotEmpty)
+                _ProviderStatusBanner(settings: providerSettings),
+              const SizedBox(height: 8),
               _StatusCard(controller: controller),
               const SizedBox(height: 16),
               if (controller.errorMessage != null) ...[
@@ -162,6 +167,32 @@ class _VoiceConversationScreenState
                 ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProviderStatusBanner extends StatelessWidget {
+  const _ProviderStatusBanner({required this.settings});
+  final ProviderSettingsController settings;
+
+  @override
+  Widget build(BuildContext context) {
+    String label(String? provider, bool? enabled) {
+      if (provider == 'mock') return 'mock (development)';
+      if (provider == 'openai' && enabled == true) return 'real provider';
+      return 'disabled';
+    }
+
+    return Card(
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          'Backend providers — STT: ${label(settings.stt?.provider, settings.stt?.enabled)}, '
+          'TTS: ${label(settings.tts?.provider, settings.tts?.enabled)}. '
+          'Mock output is for development only.',
         ),
       ),
     );

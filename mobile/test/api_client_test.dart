@@ -84,6 +84,25 @@ class FakeAdapter implements HttpClientAdapter {
   void close({bool force = false}) {}
 }
 
+class HealthAdapter implements HttpClientAdapter {
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    expect(options.uri.path, '/health');
+    return ResponseBody.fromString(
+      jsonEncode({'status': 'ok'}),
+      200,
+      headers: _jsonHeaders,
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
 const _jsonHeaders = {
   Headers.contentTypeHeader: [Headers.jsonContentType],
 };
@@ -135,5 +154,13 @@ void main() {
     await Future.wait([first, second]);
     expect(adapter.refreshCalls, 1);
     expect(tokens.writes, 1);
+  });
+
+  test('health uses the backend root health endpoint', () async {
+    final dio = Dio(BaseOptions(baseUrl: 'http://192.168.1.50:8000'))
+      ..httpClientAdapter = HealthAdapter();
+    final client = ApiClient(dio: dio);
+
+    expect((await client.health())['status'], 'ok');
   });
 }

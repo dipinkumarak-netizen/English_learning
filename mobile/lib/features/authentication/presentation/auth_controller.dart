@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/local/app_database.dart';
+import '../../../core/errors/app_error.dart';
 import '../data/auth_repository.dart';
 import '../data/token_storage.dart';
 
@@ -97,11 +98,14 @@ class AuthController extends StateNotifier<AuthState> {
         user: profile,
         onboardingComplete: profile['onboarding_complete'] as bool? ?? false,
       );
-    } catch (_) {
-      await _repository.clearTokens();
+    } catch (error) {
+      if (error is! OfflineError && error is! NetworkError) {
+        await _repository.clearTokens();
+      }
       state = AuthState(
         status: AuthStatus.local,
         onboardingComplete: local.onboardingComplete,
+        error: error is AppError ? error.message : null,
       );
     }
   }

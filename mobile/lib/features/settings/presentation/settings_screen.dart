@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../authentication/presentation/auth_controller.dart';
+import 'backend_connection_card.dart';
 import 'provider_settings_card.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -83,6 +84,8 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             const ProviderSettingsCard(),
           ],
+          const SizedBox(height: 24),
+          const BackendConnectionCard(),
           const SizedBox(height: 24),
           const Text(
             'Learning preferences',

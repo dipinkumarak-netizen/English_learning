@@ -5,6 +5,7 @@ final class AppLogger {
   static final instance = AppLogger._();
 
   void info(String message) => developer.log(message, name: 'NilaSpeak');
+  void network(String message) => developer.log(message, name: 'NilaSpeak');
   void error(String message, [Object? error, StackTrace? stackTrace]) =>
       developer.log(
         message,

@@ -199,7 +199,17 @@ class _ProviderSettingsCardState extends ConsumerState<ProviderSettingsCard> {
         state.ai?.lastTestStatus ??
         state.stt?.lastTestStatus ??
         state.tts?.lastTestStatus;
-    return 'Credential: ${configured ? 'configured' : 'not configured'}${last == null ? '' : ' • Last test: $last'}';
+    final provider =
+        state.ai?.provider ??
+        state.stt?.provider ??
+        state.tts?.provider ??
+        'none';
+    final providerLabel = provider == 'mock'
+        ? 'mock (development)'
+        : provider == 'openai'
+        ? 'real provider'
+        : 'disabled';
+    return 'Provider: $providerLabel • Credential: ${configured ? 'configured' : 'not configured'}${last == null ? '' : ' • Last test: $last'}';
   }
 
   Future<void> _save() async {

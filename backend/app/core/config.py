@@ -1,16 +1,18 @@
 from functools import lru_cache
 
+from pydantic import ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     app_env: str = "development"
     app_version: str = "0.1.0"
-    database_url: str = "postgresql+asyncpg://nilaspeak:change-me-local@localhost:5432/nilaspeak"
+    database_url: str = "sqlite+aiosqlite:///./runtime/nilaspeak.db"
+    database_expected_host: str = ""
     backend_cors_origins: str = "http://localhost:3000,http://localhost:8080"
     log_level: str = "INFO"
     allow_registration: bool = True
-    jwt_secret: str = "local-development-secret-change-before-remote-use"
+    jwt_secret: str = ""
     credential_encryption_key: str = ""
     credential_encryption_previous_key: str = ""
     provider_allowed_base_urls: str = "https://api.openai.com/v1"
@@ -50,6 +52,13 @@ class Settings(BaseSettings):
     voice_max_turns_per_session: int = 20
     voice_temp_audio_retention_minutes: int = 30
     voice_audio_storage_path: str = "./runtime/audio"
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def development_database_fallback(cls, value: object, info: ValidationInfo) -> object:
+        if value in (None, "") and info.data.get("app_env", "development") != "production":
+            return "sqlite+aiosqlite:///./runtime/nilaspeak.db"
+        return value
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
 

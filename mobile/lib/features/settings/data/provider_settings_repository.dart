@@ -27,19 +27,20 @@ class ProviderSetting {
   final DateTime? lastTestedAt;
   final DateTime? updatedAt;
 
-  factory ProviderSetting.fromJson(Map<String, dynamic> json) => ProviderSetting(
-    capability: json['capability'] as String,
-    provider: json['provider'] as String? ?? 'none',
-    configured: json['configured'] as bool? ?? false,
-    enabled: json['enabled'] as bool? ?? false,
-    keyLast4: json['key_last4'] as String?,
-    model: json['model'] as String?,
-    baseUrl: json['base_url'] as String?,
-    voice: json['voice'] as String?,
-    lastTestStatus: json['last_test_status'] as String?,
-    lastTestedAt: _date(json['last_tested_at']),
-    updatedAt: _date(json['updated_at']),
-  );
+  factory ProviderSetting.fromJson(Map<String, dynamic> json) =>
+      ProviderSetting(
+        capability: json['capability'] as String,
+        provider: json['provider'] as String? ?? 'none',
+        configured: json['configured'] as bool? ?? false,
+        enabled: json['enabled'] as bool? ?? false,
+        keyLast4: json['key_last4'] as String?,
+        model: json['model'] as String?,
+        baseUrl: json['base_url'] as String?,
+        voice: json['voice'] as String?,
+        lastTestStatus: json['last_test_status'] as String?,
+        lastTestedAt: _date(json['last_tested_at']),
+        updatedAt: _date(json['updated_at']),
+      );
 
   static DateTime? _date(Object? value) =>
       value is String ? DateTime.tryParse(value) : null;
