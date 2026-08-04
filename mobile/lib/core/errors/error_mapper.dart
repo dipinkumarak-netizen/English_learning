@@ -16,6 +16,19 @@ AppError mapDioError(Object error) {
     if (status == 403 && error.requestOptions.path.endsWith('/auth/register')) {
       return const NetworkError('Registration is currently disabled.');
     }
+    if (status == 400) {
+      final detail = error.response?.data is Map
+          ? (error.response?.data as Map)['detail']?.toString().toLowerCase()
+          : null;
+      if (detail?.contains('base url') == true) {
+        return const NetworkError(
+          'The provider settings were rejected because the base URL is invalid or not allowed.',
+        );
+      }
+      return const NetworkError(
+        'The provider settings were rejected. Check the selected provider and try again.',
+      );
+    }
     final message = status == null
         ? 'The backend request failed.'
         : switch (status) {

@@ -23,6 +23,8 @@ class _ProviderSettingsCardState extends ConsumerState<ProviderSettingsCard> {
   bool _obscure = true;
   bool _seeded = false;
 
+  bool get _disabled => providerApiValue(_provider) == 'none';
+
   @override
   void dispose() {
     _apiKey.dispose();
@@ -41,7 +43,9 @@ class _ProviderSettingsCardState extends ConsumerState<ProviderSettingsCard> {
       final ai = state.ai;
       final stt = state.stt;
       final tts = state.tts;
-      _provider = ai?.provider ?? stt?.provider ?? tts?.provider ?? 'none';
+      _provider = providerApiValue(
+        ai?.provider ?? stt?.provider ?? tts?.provider ?? 'none',
+      );
       _enabled = ai?.enabled ?? false;
       _aiModel.text = ai?.model ?? '';
       _sttModel.text = stt?.model ?? '';
@@ -89,8 +93,7 @@ class _ProviderSettingsCardState extends ConsumerState<ProviderSettingsCard> {
                             child: Text('OpenAI-compatible'),
                           ),
                         ],
-                        onChanged: (value) =>
-                            setState(() => _provider = value!),
+                        onChanged: (value) => _selectProvider(value!),
                       ),
                       TextField(
                         controller: _apiKey,
@@ -138,8 +141,10 @@ class _ProviderSettingsCardState extends ConsumerState<ProviderSettingsCard> {
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: const Text('Enable provider'),
-                        value: _enabled,
-                        onChanged: (value) => setState(() => _enabled = value),
+                        value: _disabled ? false : _enabled,
+                        onChanged: _disabled
+                            ? null
+                            : (value) => setState(() => _enabled = value),
                       ),
                       if (state.error != null)
                         Text(
@@ -161,7 +166,9 @@ class _ProviderSettingsCardState extends ConsumerState<ProviderSettingsCard> {
                             ),
                           ),
                           OutlinedButton(
-                            onPressed: state.testing ? null : _test,
+                            onPressed: state.testing || _disabled
+                                ? null
+                                : _test,
                             child: Text(
                               state.testing ? 'Testing…' : 'Test connection',
                             ),
@@ -231,6 +238,17 @@ class _ProviderSettingsCardState extends ConsumerState<ProviderSettingsCard> {
         );
       }
     }
+  }
+
+  void _selectProvider(String value) {
+    final apiValue = providerApiValue(value);
+    setState(() {
+      _provider = apiValue;
+      if (apiValue == 'none') {
+        _enabled = false;
+        _apiKey.clear();
+      }
+    });
   }
 
   Future<void> _test() async {

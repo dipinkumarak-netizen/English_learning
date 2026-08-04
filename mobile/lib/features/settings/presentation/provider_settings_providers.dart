@@ -1,8 +1,49 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/errors/app_error.dart';
 import '../../authentication/presentation/auth_controller.dart';
 import '../data/provider_settings_repository.dart';
+
+const providerLabelToApiValue = <String, String>{
+  'Disabled': 'none',
+  'Mock (development)': 'mock',
+  'OpenAI-compatible': 'openai',
+};
+
+String providerApiValue(String value) =>
+    providerLabelToApiValue[value] ?? value;
+
+bool canTestProvider(String provider) => providerApiValue(provider) != 'none';
+
+Map<String, dynamic> buildProviderPayload({
+  required String provider,
+  required String apiKey,
+  required String model,
+  required String baseUrl,
+  required String voice,
+  required bool enabled,
+}) {
+  final apiProvider = providerApiValue(provider);
+  if (apiProvider == 'none') {
+    return {
+      'provider': 'none',
+      'api_key': '',
+      'model': '',
+      'base_url': '',
+      'voice': '',
+      'enabled': false,
+    };
+  }
+  return {
+    'provider': apiProvider,
+    'api_key': apiKey,
+    'model': model,
+    'base_url': baseUrl,
+    'voice': voice,
+    'enabled': enabled,
+  };
+}
 
 final providerSettingsRepositoryProvider = Provider<ProviderSettingsRepository>(
   (ref) => ProviderSettingsRepository(
@@ -63,18 +104,18 @@ class ProviderSettingsController extends ChangeNotifier {
     notifyListeners();
     try {
       for (final capability in const ['ai', 'stt', 'tts']) {
-        final data = <String, dynamic>{
-          'provider': provider,
-          'enabled': enabled,
-          'api_key': apiKey.isEmpty ? null : apiKey,
-          'base_url': null,
-          'voice': voice,
-          'model': switch (capability) {
+        final data = buildProviderPayload(
+          provider: provider,
+          apiKey: apiKey,
+          model: switch (capability) {
             'ai' => aiModel,
             'stt' => sttModel,
             _ => ttsModel,
           },
-        };
+          baseUrl: '',
+          voice: voice,
+          enabled: enabled,
+        );
         providers = await _repository.save(capability, data);
       }
       return true;
@@ -94,17 +135,26 @@ class ProviderSettingsController extends ChangeNotifier {
     required String model,
     required String voice,
   }) async {
+    if (!canTestProvider(provider)) {
+      testMessage = 'Enable a provider before testing the connection.';
+      notifyListeners();
+      return false;
+    }
     testing = true;
     testMessage = null;
     notifyListeners();
     try {
-      final response = await _repository.test(capability, {
-        'provider': provider,
-        'api_key': apiKey.isEmpty ? null : apiKey,
-        'model': model,
-        'voice': voice,
-        'base_url': null,
-      });
+      final response = await _repository.test(
+        capability,
+        buildProviderPayload(
+          provider: provider,
+          apiKey: apiKey,
+          model: model,
+          baseUrl: '',
+          voice: voice,
+          enabled: true,
+        ),
+      );
       testMessage =
           response['message'] as String? ?? 'Connection test complete.';
       return response['status'] == 'success';
@@ -138,10 +188,9 @@ class ProviderSettingsController extends ChangeNotifier {
       .cast<ProviderSetting?>()
       .firstOrNull;
 
-  String _safeMessage(Object exception) {
-    final message = exception.toString();
-    return message.replaceFirst('Exception: ', '');
-  }
+  String _safeMessage(Object exception) => exception is AppError
+      ? exception.message
+      : 'The provider settings request failed. Please try again.';
 }
 
 extension on Iterable<ProviderSetting?> {
