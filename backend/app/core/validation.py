@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from ipaddress import ip_network
 from urllib.parse import unquote, urlparse
 
 from app.core.config import Settings
@@ -9,6 +10,29 @@ from app.provider_crypto import CredentialConfigurationError, _master_key
 def validate_settings(settings: Settings) -> list[str]:
     """Return safe configuration categories; never include secret values."""
     errors: list[str] = []
+    if settings.public_base_url:
+        public_url = urlparse(settings.public_base_url)
+        if (
+            public_url.scheme != "https"
+            or not public_url.hostname
+            or public_url.username
+            or public_url.password
+            or public_url.query
+            or public_url.fragment
+        ):
+            errors.append("public_base_url_must_be_https")
+    if settings.trust_proxy_headers:
+        if not settings.trusted_proxy_networks.strip():
+            errors.append("trusted_proxy_networks_missing")
+        else:
+            for network in settings.trusted_proxy_networks.split(","):
+                try:
+                    ip_network(network.strip(), strict=False)
+                except ValueError:
+                    errors.append("trusted_proxy_networks_invalid")
+                    break
+        if not settings.public_base_url:
+            errors.append("public_base_url_missing")
     if not settings.database_url:
         errors.append("database_url_missing")
     else:

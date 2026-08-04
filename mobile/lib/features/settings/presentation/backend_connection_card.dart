@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/app_config.dart';
 import '../../authentication/presentation/auth_controller.dart';
+import 'capability_status_providers.dart';
 
 class BackendConnectionCard extends ConsumerStatefulWidget {
   const BackendConnectionCard({super.key});
@@ -20,6 +21,7 @@ class _BackendConnectionCardState extends ConsumerState<BackendConnectionCard> {
   Widget build(BuildContext context) {
     final error = AppConfig.apiBaseUrlError;
     final uri = Uri.tryParse(AppConfig.apiBaseUrl);
+    final capability = ref.watch(capabilityStatusProvider);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -45,6 +47,13 @@ class _BackendConnectionCardState extends ConsumerState<BackendConnectionCard> {
             ],
             const SizedBox(height: 8),
             Text('Status: $_status'),
+            if (capability.status != null)
+              Text('Transport: ${capability.status!.transportLabel}'),
+            if (capability.error != null)
+              Text(
+                capability.error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
             const SizedBox(height: 8),
             OutlinedButton(
               onPressed: _testing || error != null ? null : _test,
@@ -66,6 +75,7 @@ class _BackendConnectionCardState extends ConsumerState<BackendConnectionCard> {
       setState(
         () => _status = result['status'] == 'ok' ? 'Connected' : 'Unreachable',
       );
+      await ref.read(capabilityStatusProvider).load();
     } catch (_) {
       setState(() => _status = 'Unreachable');
     } finally {

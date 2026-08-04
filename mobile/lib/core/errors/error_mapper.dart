@@ -25,6 +25,11 @@ AppError mapDioError(Object error) {
           'The provider settings were rejected because the base URL is invalid or not allowed.',
         );
       }
+      if (detail?.contains('secure https transport') == true) {
+        return const NetworkError(
+          'Provider credentials require an HTTPS backend connection.',
+        );
+      }
       return const NetworkError(
         'The provider settings were rejected. Check the selected provider and try again.',
       );
@@ -38,6 +43,9 @@ AppError mapDioError(Object error) {
               'The account already exists or conflicts with existing data.',
             422 => 'The server rejected the submitted details.',
             429 => 'Too many requests. Please try again later.',
+            413 => 'The audio upload is too large.',
+            415 => 'This audio format is not supported.',
+            503 => 'The selected provider is unavailable or not configured.',
             >= 500 => 'The backend is temporarily unavailable.',
             _ => 'The backend request failed.',
           };

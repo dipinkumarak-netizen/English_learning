@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     provider_allowed_base_urls: str = "https://api.openai.com/v1"
     provider_allow_local_urls: bool = False
     provider_settings_rate_limit_per_hour: int = 10
+    trust_proxy_headers: bool = False
+    trusted_proxy_networks: str = ""
+    public_base_url: str = ""
     access_token_minutes: int = 15
     refresh_token_days: int = 30
     ai_provider: str = "none"

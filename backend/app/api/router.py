@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.auth import router as auth_router
+from app.api.capabilities import router as capabilities_router
 from app.api.courses import router as courses_router
 from app.api.health import router as health_router
 from app.api.learning_plan import router as learning_plan_router
@@ -14,6 +15,7 @@ from app.api.voice import router as voice_router
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(health_router)
 api_router.include_router(auth_router)
+api_router.include_router(capabilities_router)
 api_router.include_router(profile_router)
 api_router.include_router(provider_settings_router)
 api_router.include_router(placement_router)

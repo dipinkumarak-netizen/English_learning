@@ -128,13 +128,58 @@ class ProviderSettingsController extends ChangeNotifier {
     }
   }
 
+  Future<bool> saveCapability({
+    required String capability,
+    required String provider,
+    required String apiKey,
+    required String model,
+    required String voice,
+    required bool enabled,
+    required bool transportAllowsMutation,
+  }) async {
+    if (!transportAllowsMutation) {
+      error = 'Provider credentials require an HTTPS backend connection.';
+      notifyListeners();
+      return false;
+    }
+    saving = true;
+    error = null;
+    notifyListeners();
+    try {
+      providers = await _repository.save(
+        capability,
+        buildProviderPayload(
+          provider: provider,
+          apiKey: apiKey,
+          model: model,
+          baseUrl: '',
+          voice: voice,
+          enabled: enabled,
+        ),
+      );
+      return true;
+    } catch (exception) {
+      error = _safeMessage(exception);
+      return false;
+    } finally {
+      saving = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> testConnection({
     required String capability,
     required String provider,
     required String apiKey,
     required String model,
     required String voice,
+    bool transportAllowsMutation = true,
   }) async {
+    if (!transportAllowsMutation) {
+      testMessage = 'Provider credentials require an HTTPS backend connection.';
+      notifyListeners();
+      return false;
+    }
     if (!canTestProvider(provider)) {
       testMessage = 'Enable a provider before testing the connection.';
       notifyListeners();
@@ -173,6 +218,30 @@ class ProviderSettingsController extends ChangeNotifier {
     notifyListeners();
     try {
       providers = await _repository.deleteAll();
+      return true;
+    } catch (exception) {
+      error = _safeMessage(exception);
+      return false;
+    } finally {
+      saving = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> deleteCapability(
+    String capability, {
+    required bool transportAllowsMutation,
+  }) async {
+    if (!transportAllowsMutation) {
+      error = 'Provider credentials require an HTTPS backend connection.';
+      notifyListeners();
+      return false;
+    }
+    saving = true;
+    error = null;
+    notifyListeners();
+    try {
+      providers = await _repository.delete(capability);
       return true;
     } catch (exception) {
       error = _safeMessage(exception);

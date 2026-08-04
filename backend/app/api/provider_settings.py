@@ -5,6 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
+from app.core.transport import effective_scheme
 from app.db.session import get_db
 from app.dependencies import current_user
 from app.models import ProviderCredential, User
@@ -31,7 +32,7 @@ router = APIRouter(prefix="/settings", tags=["settings"])
 
 def _require_secure_transport(request: Request) -> None:
     settings = get_settings()
-    scheme = request.headers.get("x-forwarded-proto", request.url.scheme).split(",")[0].strip()
+    scheme = effective_scheme(request, settings)
     if scheme == "https":
         return
     if settings.app_env == "development":

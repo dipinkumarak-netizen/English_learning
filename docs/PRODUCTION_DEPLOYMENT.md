@@ -1,5 +1,81 @@
 # NilaSpeak production deployment
 
+## Phase 7 HTTPS architecture
+
+The backend container remains plain HTTP on port 8000 and PostgreSQL is never
+published. For production, terminate TLS at a trusted reverse proxy or at a
+Tailscale HTTPS endpoint and forward only to the backend network. Direct
+production HTTP remains useful for `/health` and `/ready`, but provider
+credential mutations are rejected.
+
+Supported modes:
+
+1. Reverse proxy (recommended): point `api.example.invalid` at Nginx Proxy
+   Manager, Caddy, or Nginx and proxy to `http://127.0.0.1:8000`.
+2. Tailscale HTTPS: use a private tailnet DNS name and `tailscale serve` to
+   proxy HTTPS to `http://127.0.0.1:8000`.
+3. Development-only LAN HTTP: set `APP_ENV=development` and use the private
+   LAN URL. Never use this mode for remote access or provider credentials.
+
+For a reverse proxy on the same host, set these values in the untracked `.env`:
+
+```dotenv
+APP_ENV=production
+TRUST_PROXY_HEADERS=true
+TRUSTED_PROXY_NETWORKS=127.0.0.1/32,172.16.0.0/12
+PUBLIC_BASE_URL=https://api.example.invalid
+```
+
+Use the actual proxy container or host network only; do not copy these example
+networks without checking the immediate proxy source address. The application
+accepts `X-Forwarded-Proto` and `X-Forwarded-Host` only when the immediate
+client IP belongs to `TRUSTED_PROXY_NETWORKS`. Direct clients cannot spoof TLS.
+
+### Nginx Proxy Manager
+
+Create a Proxy Host for a real private DNS name, request a certificate through
+your trusted certificate provider, and forward to the backend host on port
+8000. Enable WebSocket support, set the scheme to `http`, and pass the standard
+`X-Forwarded-Proto` and `X-Forwarded-Host` headers. Do not put API keys or
+certificate private keys in this repository.
+
+### Plain Nginx or Caddy
+
+Example Nginx shape (replace placeholders and keep certificates outside Git):
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name api.example.invalid;
+    ssl_certificate /etc/letsencrypt/live/api.example.invalid/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.example.invalid/privkey.pem;
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_pass http://127.0.0.1:8000;
+    }
+}
+```
+
+With Caddy, `reverse_proxy 127.0.0.1:8000` provides the equivalent TLS
+termination and forwarded headers. Validate the proxy source IP before setting
+`TRUSTED_PROXY_NETWORKS`.
+
+### Tailscale HTTPS
+
+On the server, authenticate it to the private tailnet, confirm its MagicDNS
+name, then run `tailscale serve --https=443 http://127.0.0.1:8000`. Use the
+resulting HTTPS tailnet URL in the APK build. Keep the service tailnet-private;
+do not expose it with funnel unless that exposure is explicitly intended.
+Certificate issuance and renewal are managed by Tailscale. If the hostname is
+unavailable, verify tailnet login, MagicDNS, ACLs, and that HTTPS serving is
+enabled. Do not disable Android or server certificate verification.
+
+Certificate renewal must be tested before expiry. Firewall rules should expose
+only the chosen HTTPS endpoint to the intended private network; keep port 5432
+closed and do not publish PostgreSQL.
+
 This guide targets Ubuntu Server 24.04 at `/storage/appdata/nilaspeak/source`.
 Keep `.env` outside Git and preserve the named PostgreSQL and audio volumes.
 
@@ -70,6 +146,19 @@ flutter build apk --release --dart-define=APP_ENV=production --dart-define=API_B
 adb -s 7DJZRWS4SKBY5DEA install -r build/app/outputs/flutter-apk/app-release.apk
 ```
 
+For production HTTPS, use the real trusted endpoint instead:
+
+```bash
+flutter build apk --release --dart-define=APP_ENV=production --dart-define=API_BASE_URL=https://api.example.invalid
+```
+
+After login, Settings displays transport status. On HTTPS, configure AI,
+STT, and TTS independently, save the credential, test each capability, and
+confirm only masked metadata is shown. On production LAN HTTP, provider
+Save/Test/Delete controls remain disabled with: “Provider credentials require
+an HTTPS backend connection.” Login, lessons, and sync may continue over an
+explicit private-development HTTP build.
+
 On device, open Settings, verify the displayed backend host, test connection,
 log in, verify profile, confirm local progress remains after logout, test one
 access-token refresh, and verify mock/real/disabled voice status. Backend logs
@@ -89,6 +178,26 @@ according to a tested rollback plan. Do not downgrade migrations or delete
 volumes during a normal update.
 
 ## Troubleshooting
+
+- Secure HTTPS transport is required: use an HTTPS mobile URL or configure a
+  trusted proxy; do not bypass the check.
+- Forwarded proto not recognized: verify the proxy sends `X-Forwarded-Proto:
+  https` and the immediate proxy IP is in `TRUSTED_PROXY_NETWORKS`.
+- Proxy headers not trusted: do not add arbitrary client networks; correct the
+  proxy network and recreate only the backend.
+- Certificate hostname mismatch: build with the exact certificate hostname.
+- Android certificate trust failure: install/use a certificate trusted by
+  Android; never disable TLS verification.
+- Backend reachable but provider controls disabled: the endpoint is HTTP in
+  production or capability discovery is unavailable.
+- STT returns 503: STT is disabled, missing a credential, or the provider is
+  unavailable; inspect safe capability status.
+- Mock provider unexpectedly active: inspect the capability card and backend
+  environment; mock output is labelled as development-only.
+- Provider base URL rejected: use an HTTPS allow-listed URL; private URLs are
+  development-only when explicitly enabled.
+- Tailscale hostname unavailable: check MagicDNS, ACLs, device login, and
+  `tailscale serve` status.
 
 - Password authentication failed: the existing role password differs from
   `DATABASE_URL`; rotate the role safely and update both values.

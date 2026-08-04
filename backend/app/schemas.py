@@ -506,6 +506,28 @@ class ProviderTestResponse(BaseModel):
     tested_at: datetime
 
 
+class CapabilityState(BaseModel):
+    state: Literal["disabled", "mock", "real"]
+    credential_source: Literal["user_encrypted", "environment", "none"]
+    usable: bool
+    enabled: bool
+    provider: str
+
+
+class CapabilityStatusResponse(BaseModel):
+    transport_state: Literal["secure_https", "private_http", "insecure_or_invalid"]
+    registration_available: bool
+    ai: CapabilityState
+    stt: CapabilityState
+    tts: CapabilityState
+    max_audio_duration_seconds: int
+    max_upload_bytes: int
+    voice_daily_transcription_seconds: int
+    voice_daily_synthesis_characters: int
+    voice_max_turns_per_session: int
+    provider_mutations_allowed: bool
+
+
 class TutorModeResponse(BaseModel):
     id: str
     title: str

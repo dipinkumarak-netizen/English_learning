@@ -5,6 +5,7 @@ import 'voice_controller.dart';
 import 'voice_providers.dart';
 import 'voice_state_machine.dart';
 import '../../settings/presentation/provider_settings_providers.dart';
+import '../../settings/presentation/capability_status_providers.dart';
 
 class VoiceConversationScreen extends ConsumerStatefulWidget {
   const VoiceConversationScreen({required this.sessionId, super.key});
@@ -31,6 +32,8 @@ class _VoiceConversationScreenState
     final controller = ref.watch(voiceControllerProvider(widget.sessionId));
     final notifier = ref.read(voiceControllerProvider(widget.sessionId));
     final providerSettings = ref.watch(providerSettingsProvider);
+    final capabilities = ref.watch(capabilityStatusProvider);
+    final sttUsable = capabilities.status?.stt.usable == true;
     if (controller.editedTranscript != null &&
         _transcriptController.text != controller.editedTranscript) {
       _transcriptController.text = controller.editedTranscript!;
@@ -79,6 +82,15 @@ class _VoiceConversationScreenState
             if (_privacyAccepted) ...[
               if (providerSettings.providers.isNotEmpty)
                 _ProviderStatusBanner(settings: providerSettings),
+              if (capabilities.status != null && !sttUsable)
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Text(
+                      'Speech-to-text is disabled or unavailable. Enable a configured STT provider before recording.',
+                    ),
+                  ),
+                ),
               const SizedBox(height: 8),
               _StatusCard(controller: controller),
               const SizedBox(height: 16),
@@ -102,7 +114,7 @@ class _VoiceConversationScreenState
                 child: FilledButton.icon(
                   onPressed: controller.state == VoiceState.recording
                       ? notifier.stopRecording
-                      : controller.canRecord
+                      : controller.canRecord && sttUsable
                       ? notifier.startRecording
                       : null,
                   icon: Icon(
@@ -143,9 +155,11 @@ class _VoiceConversationScreenState
                   controller: _transcriptController,
                   maxLines: 4,
                   onChanged: notifier.updateTranscript,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'Recognised speech',
+                    labelText: providerSettings.stt?.provider == 'mock'
+                        ? 'Recognised speech (mock)'
+                        : 'Recognised speech',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -159,6 +173,7 @@ class _VoiceConversationScreenState
               if (controller.tutorMessage != null)
                 _TutorResponse(
                   controller: controller,
+                  mockTts: providerSettings.tts?.provider == 'mock',
                   onSynthesis: notifier.synthesiseTutorReply,
                   onPlay: notifier.playTutorAudio,
                   onStop: notifier.stopTutorAudio,
@@ -237,6 +252,7 @@ class _StatusCard extends StatelessWidget {
 class _TutorResponse extends StatelessWidget {
   const _TutorResponse({
     required this.controller,
+    required this.mockTts,
     required this.onSynthesis,
     required this.onPlay,
     required this.onStop,
@@ -244,6 +260,7 @@ class _TutorResponse extends StatelessWidget {
     required this.onSpeed,
   });
   final VoiceController controller;
+  final bool mockTts;
   final VoidCallback onSynthesis;
   final VoidCallback onPlay;
   final VoidCallback onStop;
@@ -281,6 +298,8 @@ class _TutorResponse extends StatelessWidget {
                 label: Text(
                   controller.state == VoiceState.failed
                       ? 'Retry voice'
+                      : mockTts
+                      ? 'Create tutor audio (mock)'
                       : 'Create tutor audio',
                 ),
               )

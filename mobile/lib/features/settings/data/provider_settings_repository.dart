@@ -95,6 +95,14 @@ class ProviderSettingsRepository {
     return _parse(response);
   }
 
+  Future<List<ProviderSetting>> delete(String capability) async {
+    final response = await _client.delete(
+      '/api/v1/settings/providers/$capability',
+      accessToken: await _token(),
+    );
+    return _parse(response);
+  }
+
   List<ProviderSetting> _parse(Map<String, dynamic> response) =>
       (response['providers'] as List<dynamic>? ?? const [])
           .whereType<Map<String, dynamic>>()
