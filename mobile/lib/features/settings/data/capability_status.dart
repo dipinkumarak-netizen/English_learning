@@ -50,6 +50,9 @@ class CapabilityState {
     required this.credentialSource,
     required this.usable,
     required this.provider,
+    required this.providerType,
+    required this.preview,
+    required this.validationMessage,
   });
 
   factory CapabilityState.fromJson(Object? value) {
@@ -61,6 +64,11 @@ class CapabilityState {
       credentialSource: json['credential_source'] as String? ?? 'none',
       usable: json['usable'] as bool? ?? false,
       provider: json['provider'] as String? ?? 'none',
+      providerType:
+          json['provider_type'] as String? ??
+          (json['state'] as String? ?? 'disabled'),
+      preview: json['preview'] as bool? ?? false,
+      validationMessage: json['validation_message'] as String?,
     );
   }
 
@@ -68,6 +76,9 @@ class CapabilityState {
   final String credentialSource;
   final bool usable;
   final String provider;
+  final String providerType;
+  final bool preview;
+  final String? validationMessage;
 
   String get label => switch (state) {
     'mock' => 'Mock (development)',

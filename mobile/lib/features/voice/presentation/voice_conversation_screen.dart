@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'voice_controller.dart';
 import 'voice_providers.dart';
 import 'voice_state_machine.dart';
-import '../../settings/presentation/provider_settings_providers.dart';
+import '../../settings/data/capability_status.dart';
 import '../../settings/presentation/capability_status_providers.dart';
 
 class VoiceConversationScreen extends ConsumerStatefulWidget {
@@ -22,6 +22,14 @@ class _VoiceConversationScreenState
   bool _privacyAccepted = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(capabilityStatusProvider).load();
+    });
+  }
+
+  @override
   void dispose() {
     _transcriptController.dispose();
     super.dispose();
@@ -31,9 +39,11 @@ class _VoiceConversationScreenState
   Widget build(BuildContext context) {
     final controller = ref.watch(voiceControllerProvider(widget.sessionId));
     final notifier = ref.read(voiceControllerProvider(widget.sessionId));
-    final providerSettings = ref.watch(providerSettingsProvider);
     final capabilities = ref.watch(capabilityStatusProvider);
-    final sttUsable = capabilities.status?.stt.usable == true;
+    final capabilityStatus = capabilities.status;
+    final stt = capabilityStatus?.stt;
+    final tts = capabilityStatus?.tts;
+    final sttUsable = stt?.usable == true;
     if (controller.editedTranscript != null &&
         _transcriptController.text != controller.editedTranscript) {
       _transcriptController.text = controller.editedTranscript!;
@@ -80,14 +90,15 @@ class _VoiceConversationScreenState
                 ),
               ),
             if (_privacyAccepted) ...[
-              if (providerSettings.providers.isNotEmpty)
-                _ProviderStatusBanner(settings: providerSettings),
-              if (capabilities.status != null && !sttUsable)
-                const Card(
+              if (capabilityStatus != null)
+                _ProviderStatusBanner(stt: stt!, tts: tts!),
+              if (stt != null && !sttUsable)
+                Card(
                   child: Padding(
                     padding: EdgeInsets.all(12),
                     child: Text(
-                      'Speech-to-text is disabled or unavailable. Enable a configured STT provider before recording.',
+                      stt.validationMessage ??
+                          'Speech-to-text is disabled or unavailable. Enable a configured STT provider before recording.',
                     ),
                   ),
                 ),
@@ -157,7 +168,7 @@ class _VoiceConversationScreenState
                   onChanged: notifier.updateTranscript,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: providerSettings.stt?.provider == 'mock'
+                    labelText: stt?.providerType == 'mock'
                         ? 'Recognised speech (mock)'
                         : 'Recognised speech',
                   ),
@@ -173,7 +184,7 @@ class _VoiceConversationScreenState
               if (controller.tutorMessage != null)
                 _TutorResponse(
                   controller: controller,
-                  mockTts: providerSettings.tts?.provider == 'mock',
+                  tts: tts,
                   onSynthesis: notifier.synthesiseTutorReply,
                   onPlay: notifier.playTutorAudio,
                   onStop: notifier.stopTutorAudio,
@@ -189,15 +200,21 @@ class _VoiceConversationScreenState
 }
 
 class _ProviderStatusBanner extends StatelessWidget {
-  const _ProviderStatusBanner({required this.settings});
-  final ProviderSettingsController settings;
+  const _ProviderStatusBanner({required this.stt, required this.tts});
+  final CapabilityState stt;
+  final CapabilityState tts;
 
   @override
   Widget build(BuildContext context) {
-    String label(String? provider, bool? enabled) {
-      if (provider == 'mock') return 'mock (development)';
-      if (provider == 'openai' && enabled == true) return 'real provider';
-      return 'disabled';
+    String label(CapabilityState capability) {
+      if (capability.validationMessage != null) {
+        return '${_providerName(capability.provider)} unavailable';
+      }
+      if (!capability.usable || capability.providerType == 'disabled') {
+        return 'disabled';
+      }
+      if (capability.providerType == 'mock') return 'Mock';
+      return '${_providerName(capability.provider)} (real)${capability.preview ? ' Preview' : ''}';
     }
 
     return Card(
@@ -205,13 +222,19 @@ class _ProviderStatusBanner extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Text(
-          'Backend providers — STT: ${label(settings.stt?.provider, settings.stt?.enabled)}, '
-          'TTS: ${label(settings.tts?.provider, settings.tts?.enabled)}. '
-          'Mock output is for development only.',
+          'Backend providers — STT: ${label(stt)}, TTS: ${label(tts)}. '
+          '${stt.validationMessage ?? tts.validationMessage ?? 'Mock output is for development only.'}',
         ),
       ),
     );
   }
+
+  static String _providerName(String provider) => switch (provider) {
+    'openai' => 'OpenAI',
+    'gemini' => 'Gemini',
+    'mock' => 'Mock',
+    _ => 'Provider',
+  };
 }
 
 class _StatusCard extends StatelessWidget {
@@ -252,7 +275,7 @@ class _StatusCard extends StatelessWidget {
 class _TutorResponse extends StatelessWidget {
   const _TutorResponse({
     required this.controller,
-    required this.mockTts,
+    required this.tts,
     required this.onSynthesis,
     required this.onPlay,
     required this.onStop,
@@ -260,7 +283,7 @@ class _TutorResponse extends StatelessWidget {
     required this.onSpeed,
   });
   final VoiceController controller;
-  final bool mockTts;
+  final CapabilityState? tts;
   final VoidCallback onSynthesis;
   final VoidCallback onPlay;
   final VoidCallback onStop;
@@ -293,15 +316,22 @@ class _TutorResponse extends StatelessWidget {
             const SizedBox(height: 12),
             if (controller.tutorAudioId == null)
               FilledButton.icon(
-                onPressed: onSynthesis,
+                onPressed: tts?.usable == true ? onSynthesis : null,
                 icon: const Icon(Icons.volume_up),
                 label: Text(
                   controller.state == VoiceState.failed
                       ? 'Retry voice'
-                      : mockTts
+                      : tts?.providerType == 'mock'
                       ? 'Create tutor audio (mock)'
+                      : tts?.usable != true
+                      ? 'Tutor audio unavailable'
                       : 'Create tutor audio',
                 ),
+              ),
+            if (tts?.usable != true && tts?.validationMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(tts!.validationMessage!),
               )
             else
               Wrap(

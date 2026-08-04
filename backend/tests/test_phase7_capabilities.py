@@ -71,6 +71,15 @@ def test_capability_endpoint_has_safe_contract(client, monkeypatch) -> None:
     body = response.json()
     assert body["transport_state"] == "private_http"
     assert body["provider_mutations_allowed"] is False
-    assert set(body["ai"]) == {"state", "credential_source", "usable", "enabled", "provider"}
+    assert set(body["ai"]) == {
+        "state",
+        "credential_source",
+        "usable",
+        "enabled",
+        "provider",
+        "provider_type",
+        "preview",
+        "validation_message",
+    }
     assert "api_key" not in response.text
     assert "database" not in response.text

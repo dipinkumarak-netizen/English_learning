@@ -512,6 +512,9 @@ class CapabilityState(BaseModel):
     usable: bool
     enabled: bool
     provider: str
+    provider_type: Literal["disabled", "mock", "real"]
+    preview: bool = False
+    validation_message: str | None = None
 
 
 class CapabilityStatusResponse(BaseModel):

@@ -35,12 +35,23 @@ async def _capability_state(capability: str, user: User, db: AsyncSession) -> Ca
         else ("mock" if resolved.provider == "mock" else "real")
     )
     usable = state == "mock" or (state == "real" and bool(resolved.api_key))
+    validation_message = None
+    preview = resolved.provider == "gemini" and capability == "tts"
+    if resolved.provider == "gemini" and capability == "stt":
+        usable = False
+        validation_message = (
+            "Gemini speech-to-text is unavailable for the current M4A recording format."
+        )
+    provider_type = cast(Literal["disabled", "mock", "real"], state)
     return CapabilityState(
-        state=cast(Literal["disabled", "mock", "real"], state),
+        state=provider_type,
         credential_source=cast(Literal["user_encrypted", "environment", "none"], source),
         usable=usable,
         enabled=resolved.enabled,
         provider=resolved.provider,
+        provider_type=provider_type,
+        preview=preview,
+        validation_message=validation_message,
     )
 
 

@@ -33,7 +33,9 @@ class _AISettingsScreenState extends ConsumerState<AISettingsScreen> {
   @override
   void dispose() {
     _key.dispose();
-    for (final c in [..._models.values, ..._voices.values]) c.dispose();
+    for (final c in [..._models.values, ..._voices.values]) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -77,6 +79,7 @@ class _AISettingsScreenState extends ConsumerState<AISettingsScreen> {
         }
         _error = null;
       });
+      await ref.read(capabilityStatusProvider).load();
     } catch (_) {
       if (mounted) setState(() => _error = 'AI settings could not be loaded.');
     } finally {
@@ -101,8 +104,9 @@ class _AISettingsScreenState extends ConsumerState<AISettingsScreen> {
       _key.clear();
       await _load();
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(() => _error = 'Provider account could not be saved.');
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -154,11 +158,12 @@ class _AISettingsScreenState extends ConsumerState<AISettingsScreen> {
           );
       await _load();
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(
           () => _error =
               'Provider account could not be deleted or is still in use.',
         );
+      }
     }
   }
 
@@ -192,8 +197,9 @@ class _AISettingsScreenState extends ConsumerState<AISettingsScreen> {
           );
       await _load();
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(() => _error = 'Capability settings could not be saved.');
+      }
     }
   }
 
