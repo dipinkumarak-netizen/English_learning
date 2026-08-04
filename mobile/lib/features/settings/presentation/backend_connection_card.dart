@@ -2,26 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/app_config.dart';
-import '../../authentication/presentation/auth_controller.dart';
 import 'capability_status_providers.dart';
 
-class BackendConnectionCard extends ConsumerStatefulWidget {
+class BackendConnectionCard extends ConsumerWidget {
   const BackendConnectionCard({super.key});
 
   @override
-  ConsumerState<BackendConnectionCard> createState() =>
-      _BackendConnectionCardState();
-}
-
-class _BackendConnectionCardState extends ConsumerState<BackendConnectionCard> {
-  String _status = 'Not tested';
-  bool _testing = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(capabilityStatusProvider);
     final error = AppConfig.apiBaseUrlError;
     final uri = Uri.tryParse(AppConfig.apiBaseUrl);
-    final capability = ref.watch(capabilityStatusProvider);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -46,40 +36,24 @@ class _BackendConnectionCardState extends ConsumerState<BackendConnectionCard> {
               ),
             ],
             const SizedBox(height: 8),
-            Text('Status: $_status'),
-            if (capability.status != null)
-              Text('Transport: ${capability.status!.transportLabel}'),
-            if (capability.error != null)
+            Text('Status: ${controller.connectionStatusLabel}'),
+            if (controller.status != null)
+              Text('Transport: ${controller.status!.transportLabel}'),
+            if (controller.error != null && error == null)
               Text(
-                capability.error!,
+                controller.error!,
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             const SizedBox(height: 8),
             OutlinedButton(
-              onPressed: _testing || error != null ? null : _test,
-              child: Text(_testing ? 'Testing…' : 'Test connection'),
+              onPressed: controller.testing || error != null
+                  ? null
+                  : controller.testConnection,
+              child: Text(controller.testing ? 'Testing…' : 'Test connection'),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _test() async {
-    setState(() {
-      _testing = true;
-      _status = 'Testing…';
-    });
-    try {
-      final result = await ref.read(apiClientProvider).health();
-      setState(
-        () => _status = result['status'] == 'ok' ? 'Connected' : 'Unreachable',
-      );
-      await ref.read(capabilityStatusProvider).load();
-    } catch (_) {
-      setState(() => _status = 'Unreachable');
-    } finally {
-      if (mounted) setState(() => _testing = false);
-    }
   }
 }
