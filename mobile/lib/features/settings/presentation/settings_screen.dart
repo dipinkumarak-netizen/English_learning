@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../authentication/presentation/auth_controller.dart';
 import 'backend_connection_card.dart';
-import 'provider_settings_card.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -82,7 +81,15 @@ class SettingsScreen extends ConsumerWidget {
           ),
           if (connected) ...[
             const SizedBox(height: 24),
-            const ProviderSettingsCard(),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.tune),
+                title: const Text('AI Settings'),
+                subtitle: const Text('AI Tutor, speech recognition, and voice'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/settings/ai'),
+              ),
+            ),
           ],
           const SizedBox(height: 24),
           const BackendConnectionCard(),

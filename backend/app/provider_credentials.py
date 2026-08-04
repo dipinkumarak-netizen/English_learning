@@ -12,7 +12,13 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings
-from app.models import ProviderCredential, ProviderCredentialAudit, User
+from app.models import (
+    ProviderAccount,
+    ProviderCapabilityConfig,
+    ProviderCredential,
+    ProviderCredentialAudit,
+    User,
+)
 from app.provider_crypto import (
     CredentialConfigurationError,
     decrypt_credential,
@@ -21,7 +27,7 @@ from app.provider_crypto import (
 from app.schemas import ProviderSettingsUpdate, ProviderTestRequest
 
 CAPABILITIES = ("ai", "stt", "tts")
-ALLOWED_PROVIDERS = {"none", "mock", "openai"}
+ALLOWED_PROVIDERS = {"none", "mock", "openai", "gemini"}
 
 
 @dataclass(frozen=True)
@@ -97,6 +103,43 @@ async def resolve_provider(
 ) -> ResolvedProvider:
     if capability not in CAPABILITIES:
         raise ValueError("Unsupported provider capability")
+    config = await db.scalar(
+        select(ProviderCapabilityConfig).where(
+            ProviderCapabilityConfig.user_id == user.id,
+            ProviderCapabilityConfig.capability == capability,
+        )
+    )
+    if config is not None:
+        if config.provider_account_id:
+            account = await db.scalar(
+                select(ProviderAccount).where(
+                    ProviderAccount.id == config.provider_account_id,
+                    ProviderAccount.user_id == user.id,
+                )
+            )
+            if account is None or account.provider != config.provider:
+                raise CredentialConfigurationError("Provider account configuration is invalid.")
+            key = _decrypt_with_rotation(account.encrypted_api_key, settings)
+        else:
+            key = ""
+        if config.provider in {"none", "mock"} or config.provider_account_id:
+            return ResolvedProvider(
+                provider=config.provider,
+                enabled=config.enabled,
+                api_key=key,
+                model=config.model or "",
+                base_url="",
+                voice=config.voice or "default",
+            )
+        env = _env_provider(capability, settings)
+        return ResolvedProvider(
+            provider=config.provider,
+            enabled=config.enabled,
+            api_key=env.api_key,
+            model=config.model or env.model,
+            base_url="",
+            voice=config.voice or env.voice,
+        )
     row = await db.scalar(
         select(ProviderCredential).where(
             ProviderCredential.user_id == user.id,
@@ -184,7 +227,17 @@ async def enforce_rate_limit(
         select(func.count(ProviderCredentialAudit.id)).where(
             ProviderCredentialAudit.user_id == user.id,
             ProviderCredentialAudit.capability == capability,
-            ProviderCredentialAudit.action.in_(["save", "test", "delete"]),
+            ProviderCredentialAudit.action.in_(
+                [
+                    "save",
+                    "test",
+                    "delete",
+                    "account_create",
+                    "account_update",
+                    "account_test",
+                    "account_delete",
+                ]
+            ),
             ProviderCredentialAudit.created_at >= since,
         )
     )

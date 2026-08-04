@@ -690,3 +690,33 @@ class ProviderCredentialAudit(Base):
     action: Mapped[str] = mapped_column(String(30))
     outcome: Mapped[str] = mapped_column(String(20))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ProviderAccount(TimestampMixin, Base):
+    __tablename__ = "provider_accounts"
+    __table_args__ = (UniqueConstraint("user_id", "provider"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    provider: Mapped[str] = mapped_column(String(20), index=True)
+    encrypted_api_key: Mapped[str] = mapped_column(Text)
+    key_last4: Mapped[str] = mapped_column(String(4))
+    last_test_status: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    last_test_message_safe: Mapped[str | None] = mapped_column(Text, nullable=True)
+    last_tested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class ProviderCapabilityConfig(TimestampMixin, Base):
+    __tablename__ = "provider_capability_configs"
+    __table_args__ = (UniqueConstraint("user_id", "capability"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    capability: Mapped[str] = mapped_column(String(10), index=True)
+    provider: Mapped[str] = mapped_column(String(20), default="none")
+    provider_account_id: Mapped[str | None] = mapped_column(
+        ForeignKey("provider_accounts.id", ondelete="RESTRICT"), nullable=True, index=True
+    )
+    enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    model: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    voice: Mapped[str | None] = mapped_column(String(80), nullable=True)

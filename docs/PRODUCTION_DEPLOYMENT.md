@@ -79,6 +79,48 @@ closed and do not publish PostgreSQL.
 This guide targets Ubuntu Server 24.04 at `/storage/appdata/nilaspeak/source`.
 Keep `.env` outside Git and preserve the named PostgreSQL and audio volumes.
 
+## Phase 8 provider accounts and capabilities
+
+The mobile AI Settings route manages one encrypted backend account per provider
+and separate AI, STT, and TTS capability assignments. A credential is submitted
+only over HTTPS, encrypted with `CREDENTIAL_ENCRYPTION_KEY`, and represented in
+the app only by its provider and last four characters. The resolution order is:
+user-encrypted provider account, server environment credential, then disabled.
+Provider accounts are shared by capabilities and cannot be deleted while in use.
+
+Build the app with the HTTPS endpoint explicitly:
+
+```powershell
+flutter build apk --release --dart-define=APP_ENV=production --dart-define=API_BASE_URL=https://api.example.invalid
+```
+
+In development only, LAN HTTP can be used with `APP_ENV=development`. Production
+HTTP keeps login and learning available when explicitly configured, but provider
+save/test/delete controls stay disabled and show that HTTPS is required.
+
+Gemini AI uses `generateContent` with bounded context and JSON response schema.
+Gemini TTS is a Preview integration and returns PCM wrapped as WAV. Gemini STT
+is currently not enabled for the mobile M4A recording container because the
+official Gemini audio contract requires a supported audio MIME type; do not
+present it as available until a validated AAC conversion path is added. Mock
+providers remain visibly labelled.
+
+Troubleshooting:
+
+- `Secure HTTPS transport is required`: use a trusted reverse proxy or Tailscale HTTPS URL.
+- Forwarded proto is not recognized: verify the immediate proxy IP is in `TRUSTED_PROXY_NETWORKS`.
+- Certificate hostname mismatch: build with the certificate hostname, not a LAN IP.
+- Provider controls disabled: check the Backend Connection card and use HTTPS in production.
+- STT returns 503: inspect capability status; the provider may be disabled or unsupported for M4A.
+- Mock output appears: select a real capability assignment and verify its account test status.
+- Tailscale hostname unavailable: check MagicDNS, ACLs, device login, and `tailscale serve`.
+
+Physical validation is intentionally manual: open the HTTPS APK, test connection,
+sign in, create an account, run its connection test, assign AI/STT/TTS separately,
+exercise tutor, recording/transcript review, and playback, then log out and verify
+local progress remains. Automated builds do not claim certificate or real-provider
+validation.
+
 ## First installation
 
 ```bash

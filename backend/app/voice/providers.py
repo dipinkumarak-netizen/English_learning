@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import base64
+import binascii
 import io
 import wave
 from dataclasses import dataclass
@@ -202,6 +204,10 @@ class OpenAISpeechToTextProvider:
             raise VoiceProviderUnavailable(
                 "Speech transcription is temporarily unavailable."
             ) from error
+        if response.status_code in {401, 403}:
+            raise VoiceProviderUnavailable("Speech transcription credential was rejected.")
+        if response.status_code == 429:
+            raise VoiceProviderRateLimited("Speech transcription provider rate limit reached.")
         if response.status_code != 200:
             raise _provider_error(response, "Speech transcription")
         try:
@@ -274,6 +280,10 @@ class OpenAITextToSpeechProvider:
             raise VoiceProviderTimeout("Tutor audio timed out.") from error
         except httpx.HTTPError as error:
             raise VoiceProviderUnavailable("Tutor audio is temporarily unavailable.") from error
+        if response.status_code in {401, 403}:
+            raise VoiceProviderUnavailable("Tutor audio credential was rejected.")
+        if response.status_code == 429:
+            raise VoiceProviderRateLimited("Tutor audio provider rate limit reached.")
         if response.status_code != 200:
             raise _provider_error(response, "Tutor audio")
         if not response.content or not response.headers.get("content-type", "").startswith(
@@ -300,6 +310,134 @@ class OpenAITextToSpeechProvider:
         )
 
 
+class GeminiSpeechToTextProvider:
+    name = "gemini"
+
+    def __init__(self, settings: Settings) -> None:
+        self.model = settings.stt_model
+        self._api_key = settings.stt_api_key
+        self._url = (
+            f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
+        )
+        self._timeout = settings.stt_request_timeout_seconds
+
+    async def transcribe(self, request: SpeechToTextRequest) -> SpeechToTextResult:
+        if not self._api_key:
+            raise VoiceProviderUnavailable("Speech transcription is not configured.")
+        if request.mime_type != "audio/aac":
+            raise VoiceProviderMalformed(
+                "Gemini transcription currently requires AAC audio; M4A conversion is unavailable."
+            )
+        try:
+            async with httpx.AsyncClient(timeout=self._timeout) as client:
+                response = await client.post(
+                    self._url,
+                    headers={"x-goog-api-key": self._api_key},
+                    json={
+                        "contents": [
+                            {
+                                "parts": [
+                                    {
+                                        "text": "Transcribe this audio only. Return only the spoken words without commentary."
+                                    },
+                                    {
+                                        "inlineData": {
+                                            "mimeType": "audio/aac",
+                                            "data": base64.b64encode(request.audio_bytes).decode(
+                                                "ascii"
+                                            ),
+                                        }
+                                    },
+                                ]
+                            }
+                        ]
+                    },
+                )
+        except httpx.TimeoutException as error:
+            raise VoiceProviderTimeout("Speech transcription timed out.") from error
+        except httpx.HTTPError as error:
+            raise VoiceProviderUnavailable(
+                "Speech transcription is temporarily unavailable."
+            ) from error
+        if response.status_code in {401, 403}:
+            raise VoiceProviderUnavailable("Speech transcription credential was rejected.")
+        if response.status_code == 429:
+            raise VoiceProviderRateLimited("Speech transcription provider rate limit reached.")
+        if response.status_code != 200:
+            raise _provider_error(response, "Speech transcription")
+        try:
+            candidates = response.json().get("candidates") or []
+            text = candidates[0]["content"]["parts"][0]["text"].strip()
+            if not text:
+                raise ValueError("empty transcript")
+        except (KeyError, IndexError, TypeError, ValueError) as error:
+            raise VoiceProviderMalformed(
+                "Speech transcription returned no usable transcript."
+            ) from error
+        return SpeechToTextResult(text, None, 0, self.name, self.model, [], {"audio_seconds": 0})
+
+
+class GeminiTextToSpeechProvider:
+    name = "gemini"
+    allowed_voices = {"Kore", "Puck", "Charon", "Fenrir", "Aoede"}
+
+    def __init__(self, settings: Settings) -> None:
+        self.model = settings.tts_model
+        self._api_key = settings.tts_api_key
+        self._url = (
+            f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
+        )
+        self._timeout = settings.tts_request_timeout_seconds
+
+    async def synthesise(self, request: TextToSpeechRequest) -> TextToSpeechResult:
+        if not self._api_key:
+            raise VoiceProviderUnavailable("Tutor audio is not configured.")
+        if not request.text.strip():
+            raise VoiceProviderMalformed("Tutor audio text is empty.")
+        if request.voice not in self.allowed_voices:
+            raise VoiceProviderMalformed("The configured Gemini tutor voice is not allowed.")
+        try:
+            async with httpx.AsyncClient(timeout=self._timeout) as client:
+                response = await client.post(
+                    self._url,
+                    headers={"x-goog-api-key": self._api_key},
+                    json={
+                        "contents": [{"parts": [{"text": request.text}]}],
+                        "generationConfig": {
+                            "responseModalities": ["AUDIO"],
+                            "speechConfig": {
+                                "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": request.voice}}
+                            },
+                        },
+                    },
+                )
+        except httpx.TimeoutException as error:
+            raise VoiceProviderTimeout("Tutor audio timed out.") from error
+        except httpx.HTTPError as error:
+            raise VoiceProviderUnavailable("Tutor audio is temporarily unavailable.") from error
+        if response.status_code in {401, 403}:
+            raise VoiceProviderUnavailable("Tutor audio credential was rejected.")
+        if response.status_code == 429:
+            raise VoiceProviderRateLimited("Tutor audio provider rate limit reached.")
+        if response.status_code != 200:
+            raise _provider_error(response, "Tutor audio")
+        try:
+            part = response.json()["candidates"][0]["content"]["parts"][0]
+            raw = base64.b64decode(part["inlineData"]["data"])
+            if not raw:
+                raise ValueError("empty audio")
+            buffer = io.BytesIO()
+            with wave.open(buffer, "wb") as output:
+                output.setnchannels(1)
+                output.setsampwidth(2)
+                output.setframerate(24_000)
+                output.writeframes(raw)
+            audio = buffer.getvalue()
+        except (KeyError, IndexError, TypeError, ValueError, binascii.Error) as error:
+            raise VoiceProviderMalformed("Tutor audio returned invalid PCM data.") from error
+        return TextToSpeechResult(audio, "audio/wav", 0, request.voice, self.name, self.model)
+
+
 def build_stt_provider(settings: Settings) -> SpeechToTextProvider:
     if not settings.stt_enabled or settings.stt_provider in {"", "none"}:
         return DisabledSpeechToTextProvider()
@@ -307,6 +445,8 @@ def build_stt_provider(settings: Settings) -> SpeechToTextProvider:
         return MockSpeechToTextProvider()
     if settings.stt_provider == "openai":
         return OpenAISpeechToTextProvider(settings)
+    if settings.stt_provider == "gemini":
+        return GeminiSpeechToTextProvider(settings)
     raise VoiceProviderUnavailable("The configured speech provider is unsupported.")
 
 
@@ -317,4 +457,6 @@ def build_tts_provider(settings: Settings) -> TextToSpeechProvider:
         return MockTextToSpeechProvider()
     if settings.tts_provider == "openai":
         return OpenAITextToSpeechProvider(settings)
+    if settings.tts_provider == "gemini":
+        return GeminiTextToSpeechProvider(settings)
     raise VoiceProviderUnavailable("The configured speech provider is unsupported.")

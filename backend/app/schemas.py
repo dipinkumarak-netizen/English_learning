@@ -461,7 +461,7 @@ class TutorUsageResponse(BaseModel):
 
 
 ProviderCapability = Literal["ai", "stt", "tts"]
-ProviderName = Literal["none", "mock", "openai"]
+ProviderName = Literal["none", "mock", "openai", "gemini"]
 ProviderTestStatus = Literal["success", "failed"]
 
 
@@ -526,6 +526,58 @@ class CapabilityStatusResponse(BaseModel):
     voice_daily_synthesis_characters: int
     voice_max_turns_per_session: int
     provider_mutations_allowed: bool
+
+
+class ProviderAccountCreate(BaseModel):
+    provider: Literal["openai", "gemini"]
+    api_key: str = Field(min_length=1, max_length=500)
+
+
+class ProviderAccountUpdate(BaseModel):
+    api_key: str | None = Field(default=None, min_length=1, max_length=500)
+
+
+class ProviderAccountSummary(BaseModel):
+    id: str
+    provider: str
+    configured: bool
+    key_last4: str | None
+    last_test_status: str | None
+    last_test_message_safe: str | None
+    last_tested_at: datetime | None
+    capabilities_using_account: list[str]
+    created_at: datetime | None
+    updated_at: datetime | None
+
+
+class ProviderAccountListResponse(BaseModel):
+    accounts: list[ProviderAccountSummary]
+
+
+class ProviderCapabilityUpdate(BaseModel):
+    provider: ProviderName
+    provider_account_id: str | None = None
+    enabled: bool = False
+    model: str | None = Field(default=None, max_length=160)
+    voice: str | None = Field(default=None, max_length=80)
+
+
+class ProviderCapabilitySummary(BaseModel):
+    capability: ProviderCapability
+    provider: str
+    provider_account_id: str | None
+    enabled: bool
+    model: str | None
+    voice: str | None
+    credential_source: str
+    provider_type: str
+    usable: bool
+    validation_message: str | None
+    preview: bool = False
+
+
+class ProviderCapabilityListResponse(BaseModel):
+    capabilities: list[ProviderCapabilitySummary]
 
 
 class TutorModeResponse(BaseModel):

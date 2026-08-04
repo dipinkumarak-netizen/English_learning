@@ -122,6 +122,10 @@ class OpenAITextGenerationProvider:
                         "model": self.model,
                         "messages": [
                             {"role": "system", "content": system},
+                            *[
+                                {"role": item["role"], "content": item["content"]}
+                                for item in request.context[-12:]
+                            ],
                             {"role": "user", "content": request.text},
                         ],
                         "response_format": {"type": "json_object"},
@@ -142,6 +146,84 @@ class OpenAITextGenerationProvider:
             raise ProviderMalformed("AI tutor returned an invalid response.") from error
 
 
+class GeminiTextGenerationProvider:
+    name = "gemini"
+
+    def __init__(self, settings: Settings) -> None:
+        self.model = settings.ai_model
+        self._api_key = settings.ai_api_key
+        self._url = (
+            f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
+        )
+        self._timeout = settings.ai_request_timeout_seconds
+
+    async def generate(self, request: ProviderRequest) -> TutorResponsePayload:
+        if not self._api_key:
+            raise ProviderUnavailable("AI tutor is not configured.")
+        prompt = "\n".join(
+            [
+                *[f"{item['role']}: {item['content']}" for item in request.context[-12:]],
+                f"learner: {request.text}",
+            ]
+        )
+        schema = {
+            "type": "OBJECT",
+            "properties": {
+                "reply_text": {"type": "STRING"},
+                "corrected_sentence": {"type": "STRING", "nullable": True},
+                "natural_alternative": {"type": "STRING", "nullable": True},
+                "mistake_detected": {"type": "BOOLEAN"},
+                "mistake_category": {"type": "STRING", "nullable": True},
+                "explanation_en": {"type": "STRING", "nullable": True},
+                "explanation_ml": {"type": "STRING", "nullable": True},
+                "examples": {"type": "ARRAY", "items": {"type": "STRING"}},
+                "encouragement": {"type": "STRING", "nullable": True},
+                "follow_up_question": {"type": "STRING", "nullable": True},
+                "vocabulary_items": {"type": "ARRAY", "items": {"type": "STRING"}},
+            },
+            "required": ["reply_text", "mistake_detected", "examples", "vocabulary_items"],
+        }
+        try:
+            async with httpx.AsyncClient(timeout=self._timeout) as client:
+                response = await client.post(
+                    self._url,
+                    headers={"x-goog-api-key": self._api_key},
+                    json={
+                        "systemInstruction": {
+                            "parts": [
+                                {
+                                    "text": "You are an English tutor. Support Malayalam explanations only in explanation_ml. Return JSON only."
+                                }
+                            ]
+                        },
+                        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+                        "generationConfig": {
+                            "responseMimeType": "application/json",
+                            "responseSchema": schema,
+                        },
+                    },
+                )
+        except httpx.TimeoutException as error:
+            raise ProviderTimeout("AI tutor timed out.") from error
+        except httpx.HTTPError as error:
+            raise ProviderUnavailable("AI tutor is temporarily unavailable.") from error
+        if response.status_code in {401, 403}:
+            raise ProviderUnavailable("AI tutor credential was rejected.")
+        if response.status_code == 429:
+            raise ProviderUnavailable("AI tutor rate limit or quota reached.")
+        if response.status_code >= 500:
+            raise ProviderUnavailable("AI tutor is temporarily unavailable.")
+        if response.status_code != 200:
+            raise ProviderMalformed("AI tutor rejected the request.")
+        try:
+            candidates = response.json().get("candidates") or []
+            parts = candidates[0]["content"]["parts"]
+            content = next(part["text"] for part in parts if isinstance(part.get("text"), str))
+            return TutorResponsePayload.model_validate(json.loads(content))
+        except (KeyError, IndexError, StopIteration, TypeError, ValueError) as error:
+            raise ProviderMalformed("AI tutor returned an invalid or blocked response.") from error
+
+
 def build_provider(settings: Settings) -> TextGenerationProvider:
     if not settings.ai_provider_enabled or settings.ai_provider in {"", "none"}:
         return DisabledProvider()
@@ -149,6 +231,8 @@ def build_provider(settings: Settings) -> TextGenerationProvider:
         return MockTutorProvider()
     if settings.ai_provider == "openai":
         return OpenAITextGenerationProvider(settings)
+    if settings.ai_provider == "gemini":
+        return GeminiTextGenerationProvider(settings)
     # Real provider adapters are intentionally isolated behind this boundary.
     # They can be added without exposing provider SDKs to Flutter.
     raise ProviderUnavailable(f"Unsupported AI provider: {settings.ai_provider}")

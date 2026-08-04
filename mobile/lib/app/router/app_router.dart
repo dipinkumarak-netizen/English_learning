@@ -23,6 +23,7 @@ import '../../features/tutor/presentation/tutor_chat_screen.dart';
 import '../../features/tutor/presentation/tutor_home_screen.dart';
 import '../../features/voice/presentation/voice_conversation_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/settings/presentation/ai_settings_screen.dart';
 import '../../features/settings/presentation/migration_screen.dart';
 import 'route_names.dart';
 
@@ -68,6 +69,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
       GoRoute(path: '/placement', builder: (_, _) => const PlacementScreen()),
       GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
+      GoRoute(
+        path: '/settings/ai',
+        builder: (_, _) => const AISettingsScreen(),
+      ),
       GoRoute(path: '/migration', builder: (_, _) => const MigrationScreen()),
       GoRoute(
         path: '/learning-plan',
